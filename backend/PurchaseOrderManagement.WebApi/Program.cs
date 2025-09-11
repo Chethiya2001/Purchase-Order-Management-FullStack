@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PurchaseOrderManagement.Infrastructure.Persistence;
 
@@ -9,6 +10,12 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Register global API response wrapper filter
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<PurchaseOrderManagement.WebApi.Filters.ApiResponseWrapperFilter>();
+});
+
 // Add DbContext with MySQL
 builder.Services.AddDbContext<AppDbContext>(op =>
 {
@@ -17,6 +24,13 @@ builder.Services.AddDbContext<AppDbContext>(op =>
         new MySqlServerVersion(new Version(8, 0, 29)));
     op.EnableSensitiveDataLogging();
 
+});
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
 });
 
 var app = builder.Build();
