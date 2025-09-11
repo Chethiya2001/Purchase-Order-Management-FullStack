@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using PurchaseOrderManagement.Infrastructure.Persistence;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,6 +8,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+// Add DbContext with MySQL
+builder.Services.AddDbContext<AppDbContext>(op =>
+{
+    op.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        new MySqlServerVersion(new Version(8, 0, 29)));
+    op.EnableSensitiveDataLogging();
+
+});
 
 var app = builder.Build();
 
