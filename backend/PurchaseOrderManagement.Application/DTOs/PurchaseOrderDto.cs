@@ -23,14 +23,14 @@ namespace PurchaseOrderManagement.Application.DTOs
         public string SupplierName { get; set; } = string.Empty;
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
         public decimal TotalAmount { get; set; } = 0;
-        public POStatus Status { get; set; } = POStatus.Draft;
+        public string Status { get; set; } = "Draft";
     }
     public record PurchaseOrderUpdateDto
     {
         public string Description { get; set; } = string.Empty;
         public string SupplierName { get; set; } = string.Empty;
-        public DateTime OrderDate { get; set; } 
+        public DateTime OrderDate { get; set; }
         public decimal TotalAmount { get; set; } = 0;
-        public POStatus Status { get; set; } = POStatus.Draft; 
+        public string Status { get; set; } = "Draft";
     }
 }

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PurchaseOrderManagement.Application.Interfaces;
 using PurchaseOrderManagement.Infrastructure.Persistence;
+using PurchaseOrderManagement.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +34,8 @@ builder.Services.AddApiVersioning(options =>
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.ReportApiVersions = true;
 });
+
+builder.Services.AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>();
 
 var app = builder.Build();
 

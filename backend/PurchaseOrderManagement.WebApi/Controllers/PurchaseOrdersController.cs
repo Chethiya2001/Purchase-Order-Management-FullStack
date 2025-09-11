@@ -12,15 +12,37 @@ namespace PurchaseOrderManagement.WebApi.Controllers
     [ApiVersion("1.0")]
     [ApiController]
     [Route("api/purchase-orders")]
-    public class PurchaseOrdersController(IPurchaseOrderRepository purchaseOrderRepository) : ControllerBase
+    public class PurchaseOrdersController : ControllerBase
     {
-        private readonly IPurchaseOrderRepository _purchaseOrderRepository = purchaseOrderRepository;
+        private readonly IPurchaseOrderRepository _purchaseOrderRepository;
+
+        public PurchaseOrdersController(IPurchaseOrderRepository purchaseOrderRepository)
+        {
+            _purchaseOrderRepository = purchaseOrderRepository;
+        }
+
+        [HttpGet("status")]
+        public IActionResult GetStatuses()
+        {
+            var statuses = Enum.GetNames<POStatus>();
+            return Ok(statuses);
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetAllPurchaseOrders()
         {
             var purchaseOrders = await _purchaseOrderRepository.GetAllAsync();
-            return Ok(purchaseOrders);
+            var dtos = purchaseOrders.Select(po => new PurchaseOrderDto
+            {
+                Id = po.Id,
+                PONumber = po.PONumber,
+                Description = po.Description,
+                SupplierName = po.SupplierName,
+                OrderDate = po.OrderDate,
+                TotalAmount = po.TotalAmount,
+                Status = po.Status.ToString()
+            });
+            return Ok(dtos);
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPurchaseOrderById(int id)
@@ -30,7 +52,17 @@ namespace PurchaseOrderManagement.WebApi.Controllers
             {
                 return NotFound();
             }
-            return Ok(purchaseOrder);
+            var dto = new PurchaseOrderDto
+            {
+                Id = purchaseOrder.Id,
+                PONumber = purchaseOrder.PONumber,
+                Description = purchaseOrder.Description,
+                SupplierName = purchaseOrder.SupplierName,
+                OrderDate = purchaseOrder.OrderDate,
+                TotalAmount = purchaseOrder.TotalAmount,
+                Status = purchaseOrder.Status.ToString()
+            };
+            return Ok(dto);
         }
         [HttpPost]
         public async Task<IActionResult> CreatePurchaseOrder([FromBody] PurchaseOrderCreateDto purchaseOrderCreateDto)
@@ -40,6 +72,10 @@ namespace PurchaseOrderManagement.WebApi.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (!Enum.TryParse<POStatus>(purchaseOrderCreateDto.Status, true, out var status))
+            {
+                return BadRequest($"Invalid status value: {purchaseOrderCreateDto.Status}");
+            }
             var newPurchaseOrder = new PurchaseOrder
             {
                 PONumber = purchaseOrderCreateDto.PONumber,
@@ -47,11 +83,21 @@ namespace PurchaseOrderManagement.WebApi.Controllers
                 OrderDate = DateTime.UtcNow,
                 Description = purchaseOrderCreateDto.Description,
                 TotalAmount = purchaseOrderCreateDto.TotalAmount,
-                Status = purchaseOrderCreateDto.Status
+                Status = status
             };
 
             var createdPurchaseOrder = await _purchaseOrderRepository.AddAsync(newPurchaseOrder);
-            return CreatedAtAction(nameof(GetPurchaseOrderById), new { id = createdPurchaseOrder.Id }, createdPurchaseOrder);
+            var dto = new PurchaseOrderDto
+            {
+                Id = createdPurchaseOrder.Id,
+                PONumber = createdPurchaseOrder.PONumber,
+                Description = createdPurchaseOrder.Description,
+                SupplierName = createdPurchaseOrder.SupplierName,
+                OrderDate = createdPurchaseOrder.OrderDate,
+                TotalAmount = createdPurchaseOrder.TotalAmount,
+                Status = createdPurchaseOrder.Status.ToString()
+            };
+            return CreatedAtAction(nameof(GetPurchaseOrderById), new { id = dto.Id }, dto);
         }
 
         [HttpPut("{id}")]
@@ -67,15 +113,28 @@ namespace PurchaseOrderManagement.WebApi.Controllers
             {
                 return NotFound();
             }
-
+            if (!Enum.TryParse<POStatus>(updateDto.Status, true, out var status))
+            {
+                return BadRequest($"Invalid status value: {updateDto.Status}");
+            }
             existingOrder.Description = updateDto.Description;
             existingOrder.SupplierName = updateDto.SupplierName;
-            existingOrder.OrderDate = updateDto.OrderDate;
+            existingOrder.OrderDate = DateTime.UtcNow;
             existingOrder.TotalAmount = updateDto.TotalAmount;
-            existingOrder.Status = updateDto.Status;
+            existingOrder.Status = status;
 
             var updatedOrder = await _purchaseOrderRepository.UpdateAsync(existingOrder);
-            return Ok(updatedOrder);
+            var dto = new PurchaseOrderDto
+            {
+                Id = updatedOrder.Id,
+                PONumber = updatedOrder.PONumber,
+                Description = updatedOrder.Description,
+                SupplierName = updatedOrder.SupplierName,
+                OrderDate = updatedOrder.OrderDate,
+                TotalAmount = updatedOrder.TotalAmount,
+                Status = updatedOrder.Status.ToString()
+            };
+            return Ok(dto);
         }
 
         [HttpDelete("{id}")]
