@@ -75,7 +75,7 @@ namespace PurchaseOrderManagement.WebApi.Controllers
             {
                 PONumber = purchaseOrderCreateDto.PONumber,
                 SupplierName = purchaseOrderCreateDto.SupplierName,
-                OrderDate = DateTime.UtcNow,
+                OrderDate = purchaseOrderCreateDto.OrderDate,
                 Description = purchaseOrderCreateDto.Description,
                 TotalAmount = purchaseOrderCreateDto.TotalAmount,
                 Status = status
@@ -114,7 +114,7 @@ namespace PurchaseOrderManagement.WebApi.Controllers
             }
             existingOrder.Description = updateDto.Description;
             existingOrder.SupplierName = updateDto.SupplierName;
-            existingOrder.OrderDate = DateTime.UtcNow;
+            existingOrder.OrderDate = updateDto.OrderDate;
             existingOrder.TotalAmount = updateDto.TotalAmount;
             existingOrder.Status = status;
 

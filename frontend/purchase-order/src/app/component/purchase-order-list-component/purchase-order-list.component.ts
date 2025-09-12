@@ -3,55 +3,80 @@ import { PurchaseOrderService } from '../../service/purchase-order-service';
 import { PurchaseOrder, ApiResponse } from '../../model/purchase-order.model';
 import { PurchaseOrderFormComponent } from '../purchase-order-form-component/purchase-order-form-component';
 import { CommonModule, DatePipe, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-purchase-order-list',
   standalone: true,
-  imports: [CommonModule, DatePipe, NgIf, PurchaseOrderFormComponent],
+  imports: [CommonModule, DatePipe, NgIf, FormsModule, PurchaseOrderFormComponent],
   template: `
+
     <div class="max-w-6xl mx-auto p-6">
+      <!-- Header -->
       <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-        <h1 class="text-3xl font-bold text-blue-700">Purchase Order Management</h1>
+        <h1 class="text-4xl font-extrabold text-blue-800 tracking-tight drop-shadow">Purchase Order Management</h1>
         <button
-          class="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-800 transition flex items-center gap-2"
+          class="px-6 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-400 text-white font-semibold shadow-lg hover:from-blue-700 hover:to-blue-500 transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
           (click)="openAddModel()"
         >
-          <span class="text-xl">+</span>
+          <span class="text-2xl">+</span>
           <span>Add New PO</span>
         </button>
       </div>
 
-      <h2 class="text-xl font-semibold text-gray-800 mb-4">Purchase Orders</h2>
-      <div *ngIf="loading" class="flex justify-center items-center h-32">
-        <div
-          class="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"
-        ></div>
+      <!-- Filter Bar -->
+      <div class="bg-white rounded-xl shadow-md p-4 mb-6 flex flex-wrap gap-4 items-end border border-blue-100">
+        <div>
+          <label class="block text-xs font-semibold text-blue-700 mb-1">Supplier</label>
+          <select class="border border-blue-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-300" [(ngModel)]="filterSupplier">
+            <option value="">All</option>
+            <option *ngFor="let s of supplierList" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-blue-700 mb-1">Status</label>
+          <select class="border border-blue-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-300" [(ngModel)]="filterStatus">
+            <option value="">All</option>
+            <option *ngFor="let st of statusList" [value]="st">{{ st }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-blue-700 mb-1">Start Date</label>
+          <input type="date" class="border border-blue-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-300" [(ngModel)]="filterStartDate" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-blue-700 mb-1">End Date</label>
+          <input type="date" class="border border-blue-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-300" [(ngModel)]="filterEndDate" />
+        </div>
+        <button (click)="clearFilters()" class="ml-2 px-4 py-2 rounded-lg bg-gradient-to-r from-gray-200 to-gray-100 text-gray-700 font-semibold shadow hover:from-gray-300 hover:to-gray-200 border border-gray-300">Clear</button>
       </div>
 
-      <div
-        class="overflow-x-auto rounded-lg shadow border border-gray-200"
-        *ngIf="!loading && purchaseOrders.length"
-      >
-        <table class="min-w-full bg-white">
-          <thead>
-            <tr class="bg-blue-50 text-blue-900">
-              <th class="px-4 py-3 text-left font-semibold">PO Number</th>
-              <th class="px-4 py-3 text-left font-semibold">Supplier</th>
-              <th class="px-4 py-3 text-left font-semibold">Order Date</th>
-              <th class="px-4 py-3 text-left font-semibold">Total Amount</th>
-              <th class="px-4 py-3 text-left font-semibold">Status</th>
-              <th class="px-4 py-3 text-left font-semibold">Action</th>
+      <h2 class="text-2xl font-bold text-blue-700 mb-4">Purchase Orders</h2>
+      <div *ngIf="loading" class="flex justify-center items-center h-32">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"></div>
+      </div>
+
+      <div class="overflow-x-auto rounded-2xl shadow-lg border border-blue-100" *ngIf="!loading && filteredPurchaseOrders.length">
+        <table class="min-w-full bg-white text-sm">
+          <thead class="sticky top-0 z-10">
+            <tr class="bg-gradient-to-r from-blue-100 to-blue-50 text-blue-900">
+              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider">PO Number</th>
+              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider">Supplier</th>
+              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider">Order Date</th>
+              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider">Total Amount</th>
+              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider">Status</th>
+              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider">Action</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let po of purchaseOrders" class="border-b hover:bg-blue-50 transition">
-              <td class="px-4 py-2">{{ po.poNumber }}</td>
-              <td class="px-4 py-2">{{ po.supplierName }}</td>
-              <td class="px-4 py-2">{{ po.orderDate | date }}</td>
-              <td class="px-4 py-2">{{ po.totalAmount }}</td>
-              <td class="px-4 py-2">
+            <tr *ngFor="let po of filteredPurchaseOrders; let i = index" [ngClass]="i % 2 === 0 ? 'bg-white' : 'bg-blue-50'" class="border-b transition hover:bg-blue-100">
+              <td class="px-5 py-3 font-mono text-blue-900">{{ po.poNumber }}</td>
+              <td class="px-5 py-3">{{ po.supplierName }}</td>
+              <td class="px-5 py-3">{{ po.orderDate | date }}</td>
+              <td class="px-5 py-3 font-semibold text-blue-700">{{ po.totalAmount | currency }}</td>
+              <td class="px-5 py-3">
                 <span
-                  class="inline-block px-3 py-1 rounded-full text-xs font-semibold"
+                  class="inline-block px-3 py-1 rounded-full text-xs font-bold shadow-sm"
                   [ngClass]="{
                     'bg-blue-100 text-blue-700': po.status === 'Draft',
                     'bg-green-100 text-green-700': po.status === 'Approved',
@@ -59,24 +84,25 @@ import { CommonModule, DatePipe, NgIf } from '@angular/common';
                     'bg-gray-200 text-gray-700': po.status === 'Completed',
                     'bg-red-100 text-red-700': po.status === 'Cancelled'
                   }"
-                  >{{ po.status }}</span
-                >
+                  >{{ po.status }}</span>
               </td>
-              <td class="px-4 py-2">
+              <td class="px-5 py-3 flex gap-2">
                 <button
-                  class="text-blue-600 hover:underline mr-4"
+                  class="px-3 py-1 rounded-lg bg-blue-100 text-blue-700 font-semibold hover:bg-blue-200 transition border border-blue-200 shadow-sm"
                   (click)="openAddModel(); editingPO = po"
                 >
                   Edit
                 </button>
                 <button
-                  class="text-red-600 hover:underline"
+                  class="px-3 py-1 rounded-lg bg-red-100 text-red-700 font-semibold hover:bg-red-200 transition border border-red-200 shadow-sm"
                   (click)="deletingPO = po; showDeleteModal = true"
                 >
                   Delete
                 </button>
-
-                <button class="text-green-600 hover:underline ml-4" (click)="viewItem(po)">
+                <button
+                  class="px-3 py-1 rounded-lg bg-green-100 text-green-700 font-semibold hover:bg-green-200 transition border border-green-200 shadow-sm"
+                  (click)="viewItem(po)"
+                >
                   View
                 </button>
               </td>
@@ -84,7 +110,7 @@ import { CommonModule, DatePipe, NgIf } from '@angular/common';
           </tbody>
         </table>
       </div>
-      <div *ngIf="!loading && !purchaseOrders.length" class="text-center text-gray-500 mt-8">
+      <div *ngIf="!loading && !filteredPurchaseOrders.length" class="text-center text-gray-400 mt-8 text-lg font-semibold">
         No purchase orders found.
       </div>
 
@@ -207,6 +233,47 @@ import { CommonModule, DatePipe, NgIf } from '@angular/common';
   styles: [],
 })
 export class PurchaseOrderListComponent implements OnInit {
+  // Filtering state for UI
+  filterSupplier: string = '';
+  filterStatus: string = '';
+  filterStartDate: string = '';
+  filterEndDate: string = '';
+  supplierList: string[] = [];
+  statusList: string[] = [];
+
+  // Computed filtered list
+  get filteredPurchaseOrders(): PurchaseOrder[] {
+    // Helper to get YYYY-MM-DD from ISO or date string
+    const toDateString = (d: string) => {
+      if (!d) return '';
+      // If ISO string, just take the first 10 chars
+      if (d.length >= 10 && d[4] === '-' && d[7] === '-') {
+        return d.substring(0, 10);
+      }
+      // Fallback: try to parse as Date
+      const date = new Date(d);
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      return `${date.getFullYear()}-${mm}-${dd}`;
+    };
+    return this.purchaseOrders.filter(po => {
+      const supplierMatch = !this.filterSupplier || po.supplierName === this.filterSupplier;
+      const statusMatch = !this.filterStatus || po.status === this.filterStatus;
+      const poDate = toDateString(po.orderDate);
+      const startDate = toDateString(this.filterStartDate);
+      const endDate = toDateString(this.filterEndDate);
+      const startDateMatch = !startDate || poDate >= startDate;
+      const endDateMatch = !endDate || poDate <= endDate;
+      return supplierMatch && statusMatch && startDateMatch && endDateMatch;
+    });
+  }
+
+  clearFilters() {
+    this.filterSupplier = '';
+    this.filterStatus = '';
+    this.filterStartDate = '';
+    this.filterEndDate = '';
+  }
   purchaseOrders: PurchaseOrder[] = [];
   displayedColumns: string[] = [
     'poNumber',
@@ -230,6 +297,13 @@ export class PurchaseOrderListComponent implements OnInit {
 
   ngOnInit() {
     this.fetchPurchaseOrders();
+    this.purchaseOrderService.getStatusOptions().subscribe({
+      next: (res: ApiResponse<string[]>) => {
+        if (res.success) {
+          this.statusList = res.data;
+        }
+      }
+    });
   }
   fetchPurchaseOrders() {
     this.loading = true;
@@ -237,6 +311,8 @@ export class PurchaseOrderListComponent implements OnInit {
       next: (res: ApiResponse<PurchaseOrder[]>) => {
         if (res.success) {
           this.purchaseOrders = res.data;
+          // Populate supplier list (unique names)
+          this.supplierList = Array.from(new Set(res.data.map(po => po.supplierName))).sort();
         }
         this.loading = false;
       },
