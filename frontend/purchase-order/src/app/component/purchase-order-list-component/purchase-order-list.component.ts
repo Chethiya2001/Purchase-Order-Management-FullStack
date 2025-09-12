@@ -48,6 +48,12 @@ import { FormsModule } from '@angular/forms';
           <label class="block text-xs font-semibold text-blue-700 mb-1">End Date</label>
           <input type="date" class="border border-blue-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-300" [(ngModel)]="filterEndDate" />
         </div>
+        <div>
+          <label class="block text-xs font-semibold text-blue-700 mb-1">Price Range</label>
+          <select class="border border-blue-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-300" [(ngModel)]="filterPriceRange">
+            <option *ngFor="let range of priceRanges" [value]="range.value">{{ range.label }}</option>
+          </select>
+        </div>
         <button (click)="clearFilters()" class="ml-2 px-4 py-2 rounded-lg bg-gradient-to-r from-gray-200 to-gray-100 text-gray-700 font-semibold shadow hover:from-gray-300 hover:to-gray-200 border border-gray-300">Clear</button>
       </div>
 
@@ -238,6 +244,8 @@ export class PurchaseOrderListComponent implements OnInit {
   filterStatus: string = '';
   filterStartDate: string = '';
   filterEndDate: string = '';
+  filterPriceRange: string = '';
+  priceRanges: { label: string; value: string }[] = [ { label: 'All', value: '' } ];
   supplierList: string[] = [];
   statusList: string[] = [];
 
@@ -264,7 +272,12 @@ export class PurchaseOrderListComponent implements OnInit {
       const endDate = toDateString(this.filterEndDate);
       const startDateMatch = !startDate || poDate >= startDate;
       const endDateMatch = !endDate || poDate <= endDate;
-      return supplierMatch && statusMatch && startDateMatch && endDateMatch;
+      // Price range filter
+      let priceMatch = true;
+      if (this.filterPriceRange === '0-500') priceMatch = po.totalAmount >= 0 && po.totalAmount <= 500;
+      else if (this.filterPriceRange === '500-1000') priceMatch = po.totalAmount > 500 && po.totalAmount <= 1000;
+      else if (this.filterPriceRange === '1000+') priceMatch = po.totalAmount > 1000;
+      return supplierMatch && statusMatch && startDateMatch && endDateMatch && priceMatch;
     });
   }
 
@@ -313,6 +326,14 @@ export class PurchaseOrderListComponent implements OnInit {
           this.purchaseOrders = res.data;
           // Populate supplier list (unique names)
           this.supplierList = Array.from(new Set(res.data.map(po => po.supplierName))).sort();
+          // Dynamically build priceRanges based on data
+          const has0_500 = res.data.some(po => po.totalAmount >= 0 && po.totalAmount <= 500);
+          const has500_1000 = res.data.some(po => po.totalAmount > 500 && po.totalAmount <= 1000);
+          const has1000plus = res.data.some(po => po.totalAmount > 1000);
+          this.priceRanges = [ { label: 'All', value: '' } ];
+          if (has0_500) this.priceRanges.push({ label: '0 - 500', value: '0-500' });
+          if (has500_1000) this.priceRanges.push({ label: '500 - 1000', value: '500-1000' });
+          if (has1000plus) this.priceRanges.push({ label: '1000+', value: '1000+' });
         }
         this.loading = false;
       },
