@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MaterialModule } from '../../model/material.module';
 import { CommonModule } from '@angular/common';
 import { PurchaseOrder, PurchaseOrderStatus } from '../../model/purchase-order.model';
 import { PurchaseOrderService } from '../../service/purchase-order-service';
@@ -8,90 +7,48 @@ import { PurchaseOrderService } from '../../service/purchase-order-service';
 @Component({
   selector: 'app-purchase-order-form-component',
   standalone: true,
-  imports: [ReactiveFormsModule, MaterialModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule],
   template: `
-    <div class="form-modal">
-      <form [formGroup]="poForm" (ngSubmit)="onSubmit()" class="purchase-order-form">
-        <h2>{{ isEditing ? 'Edit' : 'Add' }} Purchase Order</h2>
-        <mat-form-field appearance="fill" class="form-field">
-          <mat-label>PO Number</mat-label>
-          <input matInput formControlName="poNumber" required />
-        </mat-form-field>
-        <mat-form-field appearance="fill" class="form-field">
-          <mat-label>Description</mat-label>
-          <input matInput formControlName="description" required />
-        </mat-form-field>
-        <mat-form-field appearance="fill" class="form-field">
-          <mat-label>Supplier Name</mat-label>
-          <input matInput formControlName="supplierName" required />
-        </mat-form-field>
-        <mat-form-field appearance="fill" class="form-field">
-          <mat-label>Order Date</mat-label>
-          <input matInput [matDatepicker]="picker" formControlName="orderDate" required />
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-        </mat-form-field>
-        <mat-form-field appearance="fill" class="form-field">
-          <mat-label>Total Amount</mat-label>
-          <input matInput type="number" formControlName="totalAmount" required min="0" />
-        </mat-form-field>
-        <mat-form-field appearance="fill" class="form-field">
-          <mat-label>Status</mat-label>
-          <mat-select formControlName="status" required>
-            <mat-option *ngFor="let status of statusOptions" [value]="status">{{
-              status
-            }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <div class="form-actions">
-          <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
-          <button type="submit" class="btn btn-primary" [disabled]="!poForm.valid">
+    <div class="bg-white rounded-xl shadow-lg p-8 max-w-lg mx-auto mt-12">
+      <form [formGroup]="poForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <h2 class="text-2xl font-bold text-blue-700 mb-6">{{ isEditing ? 'Edit' : 'Add' }} Purchase Order</h2>
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">PO Number</label>
+          <input type="text" formControlName="poNumber" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition" />
+        <div>
+          <label class="block text-gray-700 font-medium  mt-2">Description</label>
+          <textarea formControlName="description" required rows="3" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition resize-y"></textarea>
+        </div>
+        </div>
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Supplier Name</label>
+          <input type="text" formControlName="supplierName" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition" />
+        </div>
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Order Date</label>
+          <input type="date" formControlName="orderDate" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition" />
+        </div>
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Total Amount</label>
+          <input type="number" formControlName="totalAmount" required min="0" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition" />
+        </div>
+        <div>
+          <label class="block text-gray-700 font-medium mb-1">Status</label>
+          <select formControlName="status" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition">
+            <option value="" disabled selected>Select status</option>
+            <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-4 mt-8">
+          <button type="button" class="px-6 py-2 rounded-lg bg-gray-500 text-white hover:bg-gray-700 transition" (click)="onCancel()">Cancel</button>
+          <button type="submit" class="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-800 transition disabled:opacity-50" [disabled]="!poForm.valid">
             {{ isEditing ? 'Update' : 'Create' }} Purchase Order
           </button>
         </div>
       </form>
     </div>
   `,
-  styles: `
-    .form-modal {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      padding: 32px;
-      margin: 40px auto;
-    }
-
-
-    .form-field {
-      width: 100%;
-    }
-
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-    }
-       .form-control {
-      padding: 12px;
-      border: 2px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 0.875rem;
-      transition: all 0.2s ease;
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    .form-control.readonly {
-      background-color: #f9fafb;
-      color: #6b7280;
-      cursor: not-allowed;
-    }
-
-  `,
+  styles: '',
 })
 export class PurchaseOrderFormComponent {
   @Output() formClose = new EventEmitter<void>();
