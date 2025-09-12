@@ -11,15 +11,10 @@ namespace PurchaseOrderManagement.WebApi.Controllers
 {
     [ApiVersion("1.0")]
     [ApiController]
-    [Route("api/purchase-orders")]
-    public class PurchaseOrdersController : ControllerBase
+    [Route("api/v{version:apiVersion}/purchase-orders")]
+    public class PurchaseOrdersController(IPurchaseOrderRepository purchaseOrderRepository) : ControllerBase
     {
-        private readonly IPurchaseOrderRepository _purchaseOrderRepository;
-
-        public PurchaseOrdersController(IPurchaseOrderRepository purchaseOrderRepository)
-        {
-            _purchaseOrderRepository = purchaseOrderRepository;
-        }
+        private readonly IPurchaseOrderRepository _purchaseOrderRepository = purchaseOrderRepository;
 
         [HttpGet("status")]
         public IActionResult GetStatuses()
