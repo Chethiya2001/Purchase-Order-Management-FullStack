@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PurchaseOrder, PurchaseOrderStatus } from '../../model/purchase-order.model';
@@ -53,6 +53,7 @@ import { PurchaseOrderService } from '../../service/purchase-order-service';
 export class PurchaseOrderFormComponent {
   @Output() formClose = new EventEmitter<void>();
   @Output() formSubmit = new EventEmitter<any>();
+  @Input() purchaseOrderToEdit?: PurchaseOrder | null;
   poForm: FormGroup;
   isEditing: boolean = false;
   statusOptions: string[] = [];
@@ -77,29 +78,63 @@ export class PurchaseOrderFormComponent {
         this.statusOptions = ['Draft', 'Approved', 'Shipped', 'Completed', 'Cancelled'];
       },
     });
+    if (this.purchaseOrderToEdit) {
+      this.setEditMode(this.purchaseOrderToEdit);
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['purchaseOrderToEdit'] && changes['purchaseOrderToEdit'].currentValue) {
+      this.setEditMode(changes['purchaseOrderToEdit'].currentValue);
+    }
+  }
+
+  setEditMode(po: PurchaseOrder) {
+    this.isEditing = true;
+    this.poForm.patchValue({
+      ...po,
+      orderDate: po.orderDate ? po.orderDate.substring(0, 10) : '', // format for input type="date"
+    });
   }
 
   onSubmit() {
     if (this.poForm.valid) {
-      const newPurchaseOrder: PurchaseOrder = {
+      const poData: PurchaseOrder = {
         ...this.poForm.value,
-        orderDate: new Date(this.poForm.value.orderDate).toISOString(), // ensure correct format
+        orderDate: new Date(this.poForm.value.orderDate).toISOString(),
       };
-
-      this.poService.create(newPurchaseOrder).subscribe({
-        next: (res) => {
-          if (res.success) {
-            this.formSubmit.emit(res.data); // return created PO to parent
-            this.poForm.reset();
-            this.formClose.emit(); // close modal after success
-          } else {
-            console.error('Create failed:', res.message);
-          }
-        },
-        error: (err) => {
-          console.error('Error creating purchase order:', err);
-        },
-      });
+      if (this.isEditing && this.purchaseOrderToEdit && this.purchaseOrderToEdit.id) {
+        this.poService.edit(this.purchaseOrderToEdit.id, poData).subscribe({
+          next: (res) => {
+            if (res.success) {
+              this.formSubmit.emit(res.data);
+              this.poForm.reset();
+              this.isEditing = false;
+              this.formClose.emit();
+            } else {
+              console.error('Update failed:', res.message);
+            }
+          },
+          error: (err) => {
+            console.error('Error updating purchase order:', err);
+          },
+        });
+      } else {
+        this.poService.create(poData).subscribe({
+          next: (res) => {
+            if (res.success) {
+              this.formSubmit.emit(res.data);
+              this.poForm.reset();
+              this.formClose.emit();
+            } else {
+              console.error('Create failed:', res.message);
+            }
+          },
+          error: (err) => {
+            console.error('Error creating purchase order:', err);
+          },
+        });
+      }
     }
   }
 
