@@ -10,6 +10,14 @@ export interface PurchaseOrder {
 
 export type PurchaseOrderStatus = 'Draft' | 'Approved' | 'Shipped' | 'Completed' | 'Cancelled';
 
+export const PURCHASE_ORDER_STATUS_OPTIONS: PurchaseOrderStatus[] = [
+  'Draft',
+  'Approved',
+  'Shipped',
+  'Completed',
+  'Cancelled',
+];
+
 export interface ApiResponse<T> {
   success: boolean;
   message: string;

@@ -1,3 +1,4 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -10,7 +11,7 @@ import { ApiResponse, PurchaseOrder } from '../model/purchase-order.model';
 export class PurchaseOrderService {
 
   private readonly apiUrl = `${BaseUrl.apiUrl}/purchase-orders`;
-
+  private readonly statusApiUrl = `${this.apiUrl}/status`;
   constructor(private http: HttpClient) { }
 
   fetchAll(filter?: any): Observable<ApiResponse<PurchaseOrder[]>> {
@@ -20,6 +21,9 @@ export class PurchaseOrderService {
 
   getById(id: number): Observable<ApiResponse<PurchaseOrder>> {
     return this.http.get<ApiResponse<PurchaseOrder>>(`${this.apiUrl}/${id}`);
+  }
+  getStatusOptions(): Observable<ApiResponse<string[]>> {
+    return this.http.get<ApiResponse<string[]>>(`${this.statusApiUrl}`);
   }
 
   create(purchaseOrder: PurchaseOrder): Observable<ApiResponse<PurchaseOrder>> {
@@ -33,5 +37,6 @@ export class PurchaseOrderService {
   delete(id: number): Observable<ApiResponse<null>> {
     return this.http.delete<ApiResponse<null>>(`${this.apiUrl}/${id}`);
   }
+
 
 }
