@@ -71,4 +71,19 @@ It allows procurement staff to **manage purchase orders (POs)** with features li
 ```bash
 git clone https://github.com/your-username/purchase-order-management.git
 cd Purchase-Order-Management-FullStack
+```
+### 2. Start Xampp or install
+
+### 2. Start XAMPP / Install
+- Install **XAMPP** (if not already installed).  
+- Start **Apache** and **MySQL** services.  
+- Make sure your MySQL connection string in `appsettings.json` matches your local credentials.
+- 
+Example:
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "server=localhost;port=3306;database=PurchaseOrderDB;user=root;password=;"
+}
+
+
 
