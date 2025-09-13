@@ -11,267 +11,521 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, DatePipe, NgIf, FormsModule, PurchaseOrderFormComponent],
   template: `
 
-    <div class="max-w-6xl mx-auto p-6">
-      <!-- Header -->
-      <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-        <h1 class="text-4xl font-extrabold text-blue-800 tracking-tight drop-shadow">Purchase Order Management</h1>
-        <button
-          class="px-6 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-400 text-white font-semibold shadow-lg hover:from-blue-700 hover:to-blue-500 transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
-          (click)="openAddModel()"
-        >
-          <span class="text-2xl">+</span>
-          <span>Add New PO</span>
-        </button>
-      </div>
+   <!-- Main Container with animated background -->
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
 
-      <!-- Filter Bar -->
-      <div class="bg-white rounded-xl shadow-md p-4 mb-6 flex flex-wrap gap-4 items-end border border-blue-100">
-        <div>
-          <label class="block text-xs font-semibold text-blue-700 mb-1">Supplier</label>
-          <select class="border border-blue-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-300" [(ngModel)]="filterSupplier">
-            <option value="">All</option>
-            <option *ngFor="let s of supplierList" [value]="s">{{ s }}</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-blue-700 mb-1">Status</label>
-          <select class="border border-blue-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-300" [(ngModel)]="filterStatus">
-            <option value="">All</option>
-            <option *ngFor="let st of statusList" [value]="st">{{ st }}</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-blue-700 mb-1">Start Date</label>
-          <input type="date" class="border border-blue-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-300" [(ngModel)]="filterStartDate" />
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-blue-700 mb-1">End Date</label>
-          <input type="date" class="border border-blue-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-300" [(ngModel)]="filterEndDate" />
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-blue-700 mb-1">Price Range</label>
-          <select class="border border-blue-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-300" [(ngModel)]="filterPriceRange">
-            <option *ngFor="let range of priceRanges" [value]="range.value">{{ range.label }}</option>
-          </select>
-        </div>
-        <button (click)="clearFilters()" class="ml-2 px-4 py-2 rounded-lg bg-gradient-to-r from-gray-200 to-gray-100 text-gray-700 font-semibold shadow hover:from-gray-300 hover:to-gray-200 border border-gray-300">Clear</button>
-      </div>
+      <!-- Floating background elements -->
+      <div class="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-3xl animate-pulse"></div>
+      <div class="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-indigo-400/10 to-teal-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
-      <h2 class="text-2xl font-bold text-blue-700 mb-4">Purchase Orders</h2>
-      <div *ngIf="loading" class="flex justify-center items-center h-32">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"></div>
-      </div>
+      <div class="relative z-10 max-w-7xl mx-auto p-6">
 
-  <div class="overflow-x-auto rounded-2xl shadow-lg border border-blue-100" *ngIf="!loading">
-        <table class="min-w-full bg-white text-sm">
-          <thead class="sticky top-0 z-10">
-            <tr class="bg-gradient-to-r from-blue-100 to-blue-50 text-blue-900">
-              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider cursor-pointer select-none" (click)="setSort('poNumber')">
-                PO Number
-                <span [ngClass]="sortField === 'poNumber' ? 'text-blue-700 font-bold' : 'text-gray-400'">
-                  ▲
-                </span>
-                <span [ngClass]="sortField === 'poNumber' ? 'text-blue-700 font-bold' : 'text-gray-400'">
-                  ▼
-                </span>
-              </th>
-              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider">Supplier</th>
-              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider cursor-pointer select-none" (click)="setSort('orderDate')">
-                Order Date
-                <span [ngClass]="sortField === 'orderDate' ? 'text-blue-700 font-bold' : 'text-gray-400'">
-                  ▲
-                </span>
-                <span [ngClass]="sortField === 'orderDate' ? 'text-blue-700 font-bold' : 'text-gray-400'">
-                  ▼
-                </span>
-              </th>
-              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider cursor-pointer select-none" (click)="setSort('totalAmount')">
-                Total Amount
-                <span [ngClass]="sortField === 'totalAmount' ? 'text-blue-700 font-bold' : 'text-gray-400'">
-                  ▲
-                </span>
-                <span [ngClass]="sortField === 'totalAmount' ? 'text-blue-700 font-bold' : 'text-gray-400'">
-                  ▼
-                </span>
-              </th>
-              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider">Status</th>
-              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let po of pagedPurchaseOrders; let i = index" [ngClass]="i % 2 === 0 ? 'bg-white' : 'bg-blue-50'" class="border-b transition hover:bg-blue-100">
-              <td class="px-5 py-3 font-mono text-blue-900">{{ po.poNumber }}</td>
-              <td class="px-5 py-3">{{ po.supplierName }}</td>
-              <td class="px-5 py-3">{{ po.orderDate | date }}</td>
-              <td class="px-5 py-3 font-semibold text-blue-700">{{ po.totalAmount | currency }}</td>
-              <td class="px-5 py-3">
-                <span
-                  class="inline-block px-3 py-1 rounded-full text-xs font-bold shadow-sm"
-                  [ngClass]="{
-                    'bg-blue-100 text-blue-700': po.status === 'Draft',
-                    'bg-green-100 text-green-700': po.status === 'Approved',
-                    'bg-yellow-100 text-yellow-700': po.status === 'Shipped',
-                    'bg-gray-200 text-gray-700': po.status === 'Completed',
-                    'bg-red-100 text-red-700': po.status === 'Cancelled'
-                  }"
-                  >{{ po.status }}</span>
-              </td>
-              <td class="px-5 py-3 flex gap-2">
-                <button
-                  class="px-3 py-1 rounded-lg bg-blue-100 text-blue-700 font-semibold hover:bg-blue-200 transition border border-blue-200 shadow-sm"
-                  (click)="openAddModel(); editingPO = po"
-                >
-                  Edit
-                </button>
-                <button
-                  class="px-3 py-1 rounded-lg bg-red-100 text-red-700 font-semibold hover:bg-red-200 transition border border-red-200 shadow-sm"
-                  (click)="deletingPO = po; showDeleteModal = true"
-                >
-                  Delete
-                </button>
-                <button
-                  class="px-3 py-1 rounded-lg bg-green-100 text-green-700 font-semibold hover:bg-green-200 transition border border-green-200 shadow-sm"
-                  (click)="viewItem(po)"
-                >
-                  View
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-  <!-- Pagination Controls -->
-  <div *ngIf="pagedPurchaseOrders.length" class="flex flex-wrap items-center justify-between gap-4 m-5">
-          <div class="flex items-center gap-2">
-            <label class="text-sm text-gray-700">Rows per page:</label>
-            <select [(ngModel)]="pageSize" (ngModelChange)="goToPage(1)" class="border border-blue-200 rounded px-2 py-1">
-              <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
-            </select>
-          </div>
-          <div class="flex items-center gap-2">
-            <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1" class="px-2 py-1 rounded bg-blue-100 text-blue-700 disabled:opacity-50">Prev</button>
-            <span class="text-sm">Page {{ currentPage }} of {{ totalPages }}</span>
-            <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-2 py-1 rounded bg-blue-100 text-blue-700 disabled:opacity-50">Next</button>
-          </div>
-        </div>
-      </div>
-      <div *ngIf="!loading && !filteredPurchaseOrders.length" class="text-center text-gray-400 mt-8 text-lg font-semibold">
-        No purchase orders found.
-      </div>
-
-  <!-- Add/Edit Modal -->
-      <!-- View Details Modal -->
-      <div *ngIf="showViewModal" class="modal-overlay flex items-center justify-center z-50 fixed inset-0 bg-black bg-opacity-40" (click)="closeViewModal()">
-        <div
-          class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 relative animate-fade-in-up pointer-events-auto border border-blue-100"
-          (click)="$event.stopPropagation()"
-        >
-          <div class="flex justify-between items-center border-b px-8 py-5 bg-blue-50 rounded-t-2xl">
-            <h2 class="text-2xl font-bold text-blue-700 tracking-wide">Purchase Order Details</h2>
+        <!-- Header Section -->
+        <div class="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 mb-8 border border-white/20">
+          <div class="flex flex-col lg:flex-row justify-between items-center gap-6">
+            <div class="text-center lg:text-left">
+              <h1 class="text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-600 bg-clip-text text-transparent mb-2">
+                Purchase Order Management
+              </h1>
+              <p class="text-gray-600 text-lg">Manage and track all your purchase orders efficiently</p>
+            </div>
             <button
-              (click)="closeViewModal()"
-              class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-blue-100 text-2xl text-blue-400 hover:text-blue-700 transition"
-              aria-label="Close"
+              class="group relative px-8 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden"
+              (click)="openAddModel()"
             >
-              ×
+              <div class="absolute inset-0 bg-white/20 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
+              <div class="relative z-10 flex items-center gap-3">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                <span>Add New PO</span>
+              </div>
             </button>
           </div>
-          <div class="p-8" *ngIf="viewingPO">
-            <dl class="grid grid-cols-1 gap-y-4 gap-x-8 sm:grid-cols-2">
-              <div>
-                <dt class="text-sm font-medium text-gray-500">PO Number</dt>
-                <dd class="mt-1 text-lg font-semibold text-gray-900">{{ viewingPO.poNumber }}</dd>
-              </div>
-              <div>
-                <dt class="text-sm font-medium text-gray-500">Status</dt>
-                <dd class="mt-1">
-                  <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold"
-                    [ngClass]="{
-                      'bg-blue-100 text-blue-700': viewingPO.status === 'Draft',
-                      'bg-green-100 text-green-700': viewingPO.status === 'Approved',
-                      'bg-yellow-100 text-yellow-700': viewingPO.status === 'Shipped',
-                      'bg-gray-200 text-gray-700': viewingPO.status === 'Completed',
-                      'bg-red-100 text-red-700': viewingPO.status === 'Cancelled'
-                    }"
-                  >{{ viewingPO.status }}</span>
-                </dd>
-              </div>
-              <div class="sm:col-span-2">
-                <dt class="text-sm font-medium text-gray-500">Description</dt>
-                <dd class="mt-1 text-gray-900">{{ viewingPO.description }}</dd>
-              </div>
-              <div>
-                <dt class="text-sm font-medium text-gray-500">Supplier</dt>
-                <dd class="mt-1 text-gray-900">{{ viewingPO.supplierName }}</dd>
-              </div>
-              <div>
-                <dt class="text-sm font-medium text-gray-500">Order Date</dt>
-                <dd class="mt-1 text-gray-900">{{ viewingPO.orderDate | date }}</dd>
-              </div>
-              <div class="sm:col-span-2">
-                <dt class="text-sm font-medium text-gray-500">Total Amount</dt>
-                <dd class="mt-1 text-gray-900">{{ viewingPO.totalAmount | currency }}</dd>
-              </div>
-            </dl>
-          </div>
-          <div class="p-8 text-center text-gray-500" *ngIf="viewLoading">Loading...</div>
         </div>
-      </div>
-      <div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
-        <div
-          class="bg-white rounded-xl shadow-lg w-full max-w-xl mx-4 relative animate-fade-in-up z-10 pointer-events-auto"
-          (click)="$event.stopPropagation()"
-        >
-          <div class="flex justify-between items-center border-b px-6 py-4">
-            <h2 class="text-xl font-bold text-blue-700">
-              {{ editingPO ? 'Edit Purchase Order' : 'Add New Purchase Order' }}
-            </h2>
-            <button
-              (click)="closeModal()"
-              class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-2xl text-gray-400 hover:text-gray-700 transition"
-            >
-              ×
-            </button>
-          </div>
-          <div class="p-6">
-            <app-purchase-order-form-component
-              [purchaseOrderToEdit]="editingPO"
-              (formSubmit)="onFormSubmit($event)"
-              (formClose)="closeModal()"
-            >
-            </app-purchase-order-form-component>
-          </div>
-        </div>
-      </div>
 
-      <!-- Delete Confirmation Modal -->
-      <div *ngIf="showDeleteModal" class="modal-overlay" (click)="showDeleteModal = false">
-        <div
-          class="bg-white rounded-xl shadow-lg w-full max-w-md mx-4 relative animate-fade-in-up z-10 pointer-events-auto"
-          (click)="$event.stopPropagation()"
-        >
-          <div class="p-6">
-            <h2 class="text-xl font-bold text-red-600 mb-4">Confirm Deletion</h2>
-            <p class="mb-6">
-              Are you sure you want to delete PO <strong>{{ deletingPO?.poNumber }}</strong
-              >?
-            </p>
-            <div class="flex justify-end gap-4">
-              <button
-                (click)="showDeleteModal = false"
-                class="px-6 py-2 rounded-lg bg-gray-500 text-white hover:bg-gray-700 transition"
-              >
-                Cancel
-              </button>
-              <button
-                (click)="confirmDelete()"
-                class="px-6 py-2 rounded-lg bg-red-600 text-white hover:bg-red-800 transition"
-              >
-                Confirm
+        <!-- Advanced Filter Bar -->
+        <div class="bg-white/60 backdrop-blur-xl rounded-2xl shadow-xl p-6 mb-8 border border-white/30">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 items-end">
+
+            <!-- Supplier Filter -->
+            <div class="group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                Supplier
+              </label>
+              <select class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-300 bg-white/80 hover:bg-white group-hover:border-gray-300" [(ngModel)]="filterSupplier">
+                <option value="">All Suppliers</option>
+                <option *ngFor="let s of supplierList" [value]="s">{{ s }}</option>
+              </select>
+            </div>
+
+            <!-- Status Filter -->
+            <div class="group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Status
+              </label>
+              <select class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all duration-300 bg-white/80 hover:bg-white group-hover:border-gray-300" [(ngModel)]="filterStatus">
+                <option value="">All Status</option>
+                <option *ngFor="let st of statusList" [value]="st">{{ st }}</option>
+              </select>
+            </div>
+
+            <!-- Start Date Filter -->
+            <div class="group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                <svg class="w-4 h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Start Date
+              </label>
+              <input type="date" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100 transition-all duration-300 bg-white/80 hover:bg-white group-hover:border-gray-300" [(ngModel)]="filterStartDate" />
+            </div>
+
+            <!-- End Date Filter -->
+            <div class="group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                End Date
+              </label>
+              <input type="date" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition-all duration-300 bg-white/80 hover:bg-white group-hover:border-gray-300" [(ngModel)]="filterEndDate" />
+            </div>
+
+            <!-- Price Range Filter -->
+            <div class="group">
+              <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                </svg>
+                Price Range
+              </label>
+              <select class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-300 bg-white/80 hover:bg-white group-hover:border-gray-300" [(ngModel)]="filterPriceRange">
+                <option *ngFor="let range of priceRanges" [value]="range.value">{{ range.label }}</option>
+              </select>
+            </div>
+
+            <!-- Clear Filters Button -->
+            <div class="flex justify-end">
+              <button (click)="clearFilters()"
+                      class="px-6 py-3 rounded-xl bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 font-semibold shadow-lg hover:from-gray-200 hover:to-gray-300 transition-all duration-300 border border-gray-300 hover:shadow-xl transform hover:scale-105 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Clear
               </button>
             </div>
           </div>
         </div>
+
+        <!-- Purchase Orders Section Title -->
+        <div class="flex items-center gap-3 mb-6">
+          <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <h2 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Purchase Orders</h2>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="loading" class="flex flex-col items-center justify-center h-64 bg-white/60 backdrop-blur-xl rounded-2xl shadow-xl border border-white/30">
+          <div class="relative">
+            <div class="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 border-t-indigo-600"></div>
+            <div class="absolute inset-0 animate-ping rounded-full h-16 w-16 border-4 border-indigo-400 opacity-20"></div>
+          </div>
+          <p class="mt-4 text-gray-600 font-medium">Loading purchase orders...</p>
+        </div>
+
+        <!-- Data Table -->
+        <div class="bg-white/60 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 overflow-hidden" *ngIf="!loading">
+          <div class="overflow-x-auto">
+            <table class="min-w-full">
+              <thead>
+                <tr class="bg-gradient-to-r from-indigo-600/90 via-purple-600/90 to-teal-600/90 text-white">
+                  <th class="px-6 py-4 text-left font-bold uppercase tracking-wider cursor-pointer select-none hover:bg-white/10 transition-all duration-300 group" (click)="setSort('poNumber')">
+                    <div class="flex items-center gap-2">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                      </svg>
+                      PO Number
+                      <div class="flex flex-col ml-1">
+                        <svg class="w-3 h-3 transition-all duration-200" [class]="sortField === 'poNumber' && sortDirection === 'asc' ? 'text-yellow-300' : 'text-white/50'" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                        </svg>
+                        <svg class="w-3 h-3 transform rotate-180 transition-all duration-200" [class]="sortField === 'poNumber' && sortDirection === 'desc' ? 'text-yellow-300' : 'text-white/50'" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </th>
+                  <th class="px-6 py-4 text-left font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-2">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                      Supplier
+                    </div>
+                  </th>
+                  <th class="px-6 py-4 text-left font-bold uppercase tracking-wider cursor-pointer select-none hover:bg-white/10 transition-all duration-300 group" (click)="setSort('orderDate')">
+                    <div class="flex items-center gap-2">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      Order Date
+                      <div class="flex flex-col ml-1">
+                        <svg class="w-3 h-3 transition-all duration-200" [class]="sortField === 'orderDate' && sortDirection === 'asc' ? 'text-yellow-300' : 'text-white/50'" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                        </svg>
+                        <svg class="w-3 h-3 transform rotate-180 transition-all duration-200" [class]="sortField === 'orderDate' && sortDirection === 'desc' ? 'text-yellow-300' : 'text-white/50'" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </th>
+                  <th class="px-6 py-4 text-left font-bold uppercase tracking-wider cursor-pointer select-none hover:bg-white/10 transition-all duration-300 group" (click)="setSort('totalAmount')">
+                    <div class="flex items-center gap-2">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                      </svg>
+                      Total Amount
+                      <div class="flex flex-col ml-1">
+                        <svg class="w-3 h-3 transition-all duration-200" [class]="sortField === 'totalAmount' && sortDirection === 'asc' ? 'text-yellow-300' : 'text-white/50'" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                        </svg>
+                        <svg class="w-3 h-3 transform rotate-180 transition-all duration-200" [class]="sortField === 'totalAmount' && sortDirection === 'desc' ? 'text-yellow-300' : 'text-white/50'" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </th>
+                  <th class="px-6 py-4 text-left font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-2">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Status
+                    </div>
+                  </th>
+                  <th class="px-6 py-4 text-left font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-2">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                      </svg>
+                      Actions
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200/50">
+                <tr *ngFor="let po of pagedPurchaseOrders; let i = index"
+                    class="transition-all duration-300 hover:bg-white/80 hover:shadow-lg group"
+                    [class]="i % 2 === 0 ? 'bg-white/40' : 'bg-gray-50/40'">
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <div class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse group-hover:animate-none group-hover:bg-indigo-600 transition-colors"></div>
+                      <span class="font-mono font-bold text-gray-900">{{ po.poNumber }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <div class="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        {{ po.supplierName.charAt(0).toUpperCase() }}
+                      </div>
+                      <span class="font-medium text-gray-900">{{ po.supplierName }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-gray-700 font-medium">{{ po.orderDate | date }}</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-1">
+                      <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                      </svg>
+                      <span class="font-bold text-gray-900">{{ po.totalAmount | currency }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold shadow-md transition-all duration-300 hover:shadow-lg"
+                          [ngClass]="{
+                            'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800': po.status === 'Draft',
+                            'bg-gradient-to-r from-green-100 to-green-200 text-green-800': po.status === 'Approved',
+                            'bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800': po.status === 'Shipped',
+                            'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800': po.status === 'Completed',
+                            'bg-gradient-to-r from-red-100 to-red-200 text-red-800': po.status === 'Cancelled'
+                          }">
+                      <div class="w-2 h-2 rounded-full animate-pulse"
+                           [ngClass]="{
+                             'bg-blue-600': po.status === 'Draft',
+                             'bg-green-600': po.status === 'Approved',
+                             'bg-yellow-600': po.status === 'Shipped',
+                             'bg-gray-600': po.status === 'Completed',
+                             'bg-red-600': po.status === 'Cancelled'
+                           }"></div>
+                      {{ po.status }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex gap-2">
+                      <button class="group px-3 py-2 rounded-lg bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 font-semibold hover:from-blue-200 hover:to-blue-300 transition-all duration-300 border border-blue-300 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center gap-1"
+                              (click)="openAddModel(); editingPO = po">
+                        <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Edit
+                      </button>
+                      <button class="group px-3 py-2 rounded-lg bg-gradient-to-r from-red-100 to-red-200 text-red-700 font-semibold hover:from-red-200 hover:to-red-300 transition-all duration-300 border border-red-300 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center gap-1"
+                              (click)="deletingPO = po; showDeleteModal = true">
+                        <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete
+                      </button>
+                      <button class="group px-3 py-2 rounded-lg bg-gradient-to-r from-green-100 to-green-200 text-green-700 font-semibold hover:from-green-200 hover:to-green-300 transition-all duration-300 border border-green-300 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center gap-1"
+                              (click)="viewItem(po)">
+                        <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        View
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div *ngIf="pagedPurchaseOrders.length" class="bg-white/40 backdrop-blur-sm px-6 py-4 border-t border-gray-200/50">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                  </svg>
+                  Rows per page:
+                </label>
+                <select [(ngModel)]="pageSize" (ngModelChange)="goToPage(1)"
+                        class="border-2 border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all duration-300">
+                  <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                </select>
+              </div>
+              <div class="flex items-center gap-3">
+                <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1"
+                        class="px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-100 to-indigo-200 text-indigo-700 font-semibold hover:from-indigo-200 hover:to-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 border border-indigo-300 shadow-md hover:shadow-lg transform hover:scale-105 disabled:transform-none flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Prev
+                </button>
+                <div class="px-4 py-2 bg-white/60 backdrop-blur-sm rounded-lg border border-gray-200 shadow-md">
+                  <span class="text-sm font-semibold text-gray-700">Page {{ currentPage }} of {{ totalPages }}</span>
+                </div>
+                <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages"
+                        class="px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-100 to-indigo-200 text-indigo-700 font-semibold hover:from-indigo-200 hover:to-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 border border-indigo-300 shadow-md hover:shadow-lg transform hover:scale-105 disabled:transform-none flex items-center gap-1">
+                  Next
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Data State -->
+        <div *ngIf="!loading && !filteredPurchaseOrders.length"
+             class="flex flex-col items-center justify-center h-64 bg-white/60 backdrop-blur-xl rounded-2xl shadow-xl border border-white/30">
+          <svg class="w-24 h-24 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <h3 class="text-xl font-semibold text-gray-500 mb-2">No Purchase Orders Found</h3>
+          <p class="text-gray-400 text-center max-w-md">No purchase orders match your current filters. Try adjusting your search criteria or create a new purchase order.</p>
+        </div>
+
+        <!-- View Details Modal -->
+        <div *ngIf="showViewModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" (click)="closeViewModal()">
+          <div class="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-2xl relative border border-white/20 overflow-hidden animate-fade-in-up"
+               (click)="$event.stopPropagation()">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-600 px-8 py-6 relative overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-r from-indigo-600/20 to-purple-600/20"></div>
+              <div class="absolute -top-4 -right-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+              <div class="relative z-10 flex justify-between items-center">
+                <div>
+                  <h2 class="text-2xl font-bold text-white mb-1 flex items-center gap-3">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Purchase Order Details
+                  </h2>
+                  <p class="text-white/80 text-sm">Complete information about this purchase order</p>
+                </div>
+                <button (click)="closeViewModal()"
+                        class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 text-white transition-all duration-300 group">
+                  <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-8" *ngIf="viewingPO">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="group">
+                  <dt class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                    </svg>
+                    PO Number
+                  </dt>
+                  <dd class="text-2xl font-bold text-gray-900 font-mono bg-gray-50 px-4 py-2 rounded-lg">{{ viewingPO.poNumber }}</dd>
+                </div>
+                <div class="group">
+                  <dt class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Status
+                  </dt>
+                  <dd>
+                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold shadow-lg"
+                          [ngClass]="{
+                            'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800': viewingPO.status === 'Draft',
+                            'bg-gradient-to-r from-green-100 to-green-200 text-green-800': viewingPO.status === 'Approved',
+                            'bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800': viewingPO.status === 'Shipped',
+                            'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800': viewingPO.status === 'Completed',
+                            'bg-gradient-to-r from-red-100 to-red-200 text-red-800': viewingPO.status === 'Cancelled'
+                          }">
+                      <div class="w-3 h-3 rounded-full animate-pulse"
+                           [ngClass]="{
+                             'bg-blue-600': viewingPO.status === 'Draft',
+                             'bg-green-600': viewingPO.status === 'Approved',
+                             'bg-yellow-600': viewingPO.status === 'Shipped',
+                             'bg-gray-600': viewingPO.status === 'Completed',
+                             'bg-red-600': viewingPO.status === 'Cancelled'
+                           }"></div>
+                      {{ viewingPO.status }}
+                    </span>
+                  </dd>
+                </div>
+                <div class="md:col-span-2 group">
+                  <dt class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+                    </svg>
+                    Description
+                  </dt>
+                  <dd class="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg border-l-4 border-teal-400">{{ viewingPO.description }}</dd>
+                </div>
+                <div class="group">
+                  <dt class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    Supplier
+                  </dt>
+                  <dd class="text-lg font-semibold text-gray-900 bg-gray-50 px-4 py-2 rounded-lg">{{ viewingPO.supplierName }}</dd>
+                </div>
+                <div class="group">
+                  <dt class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Order Date
+                  </dt>
+                  <dd class="text-lg font-semibold text-gray-900 bg-gray-50 px-4 py-2 rounded-lg">{{ viewingPO.orderDate | date }}</dd>
+                </div>
+                <div class="md:col-span-2 group">
+                  <dt class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                    </svg>
+                    Total Amount
+                  </dt>
+                  <dd class="text-3xl font-bold text-green-600 bg-green-50 px-4 py-3 rounded-lg border-l-4 border-green-400">{{ viewingPO.totalAmount | currency }}</dd>
+                </div>
+              </div>
+            </div>
+
+            <!-- Loading State for Modal -->
+            <div class="p-12 text-center" *ngIf="viewLoading">
+              <div class="relative inline-block">
+                <div class="animate-spin rounded-full h-12 w-12 border-4 border-indigo-200 border-t-indigo-600"></div>
+                <div class="absolute inset-0 animate-ping rounded-full h-12 w-12 border-4 border-indigo-400 opacity-20"></div>
+              </div>
+              <p class="mt-4 text-gray-600 font-medium">Loading purchase order details...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add/Edit Modal -->
+        <div *ngIf="showModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" (click)="closeModal()">
+          <div class="w-full max-w-4xl relative animate-fade-in-up" (click)="$event.stopPropagation()">
+            <app-purchase-order-form-component
+              [purchaseOrderToEdit]="editingPO"
+              (formSubmit)="onFormSubmit($event)"
+              (formClose)="closeModal()">
+            </app-purchase-order-form-component>
+          </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div *ngIf="showDeleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" (click)="showDeleteModal = false">
+          <div class="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-md relative border border-white/20 overflow-hidden animate-fade-in-up"
+               (click)="$event.stopPropagation()">
+            <!-- Warning Header -->
+            <div class="bg-gradient-to-r from-red-500 to-red-600 px-6 py-4 relative overflow-hidden">
+              <div class="absolute inset-0 bg-red-600/20"></div>
+              <div class="relative z-10 flex items-center gap-3">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L4.348 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <h2 class="text-xl font-bold text-white">Confirm Deletion</h2>
+              </div>
+            </div>
+
+            <!-- Content -->
+            <div class="p-6">
+              <p class="text-gray-700 mb-6 leading-relaxed">
+                Are you sure you want to delete purchase order <strong class="font-mono text-red-600 bg-red-50 px-2 py-1 rounded">{{ deletingPO?.poNumber }}</strong>? This action cannot be undone.
+              </p>
+              <div class="flex justify-end gap-3">
+                <button (click)="showDeleteModal = false"
+                        class="px-6 py-3 rounded-lg bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-all duration-300 border border-gray-300 shadow-md hover:shadow-lg">
+                  Cancel
+                </button>
+                <button (click)="confirmDelete()"
+                        class="px-6 py-3 rounded-lg bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
+                  Delete Forever
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- Custom Styles -->
+      <style>
+        @keyframes fade-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in-up {
+          animation: fade-in-up 0.4s ease-out;
+        }
+      </style>
     </div>
   `,
   styles: [],
