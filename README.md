@@ -134,11 +134,16 @@ dotnet ef database update --project ../PurchaseOrderManagement.Infrastructure --
 dotnet run --urls "https://localhost:5001;http://localhost:5000"
 ```
 
-
-
 ### 5. Frontend Setup 
 
+1. Navigate to the frontend folder and build the project:
 ```bash
-node -v
+cd frontend
+cd purchase-order
 ````
 
+2. Install dependencies and start the application:
+```bash
+npm i
+npm start
+````
