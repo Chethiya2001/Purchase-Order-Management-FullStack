@@ -62,20 +62,44 @@ import { FormsModule } from '@angular/forms';
         <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"></div>
       </div>
 
-      <div class="overflow-x-auto rounded-2xl shadow-lg border border-blue-100" *ngIf="!loading && filteredPurchaseOrders.length">
+      <div class="overflow-x-auto rounded-2xl shadow-lg border border-blue-100" *ngIf="!loading && sortedPurchaseOrders.length">
         <table class="min-w-full bg-white text-sm">
           <thead class="sticky top-0 z-10">
             <tr class="bg-gradient-to-r from-blue-100 to-blue-50 text-blue-900">
-              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider">PO Number</th>
+              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider cursor-pointer select-none" (click)="setSort('poNumber')">
+                PO Number
+                <span [ngClass]="sortField === 'poNumber' ? 'text-blue-700 font-bold' : 'text-gray-400'">
+                  ▲
+                </span>
+                <span [ngClass]="sortField === 'poNumber' ? 'text-blue-700 font-bold' : 'text-gray-400'">
+                  ▼
+                </span>
+              </th>
               <th class="px-5 py-3 text-left font-bold uppercase tracking-wider">Supplier</th>
-              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider">Order Date</th>
-              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider">Total Amount</th>
+              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider cursor-pointer select-none" (click)="setSort('orderDate')">
+                Order Date
+                <span [ngClass]="sortField === 'orderDate' ? 'text-blue-700 font-bold' : 'text-gray-400'">
+                  ▲
+                </span>
+                <span [ngClass]="sortField === 'orderDate' ? 'text-blue-700 font-bold' : 'text-gray-400'">
+                  ▼
+                </span>
+              </th>
+              <th class="px-5 py-3 text-left font-bold uppercase tracking-wider cursor-pointer select-none" (click)="setSort('totalAmount')">
+                Total Amount
+                <span [ngClass]="sortField === 'totalAmount' ? 'text-blue-700 font-bold' : 'text-gray-400'">
+                  ▲
+                </span>
+                <span [ngClass]="sortField === 'totalAmount' ? 'text-blue-700 font-bold' : 'text-gray-400'">
+                  ▼
+                </span>
+              </th>
               <th class="px-5 py-3 text-left font-bold uppercase tracking-wider">Status</th>
               <th class="px-5 py-3 text-left font-bold uppercase tracking-wider">Action</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let po of filteredPurchaseOrders; let i = index" [ngClass]="i % 2 === 0 ? 'bg-white' : 'bg-blue-50'" class="border-b transition hover:bg-blue-100">
+            <tr *ngFor="let po of sortedPurchaseOrders; let i = index" [ngClass]="i % 2 === 0 ? 'bg-white' : 'bg-blue-50'" class="border-b transition hover:bg-blue-100">
               <td class="px-5 py-3 font-mono text-blue-900">{{ po.poNumber }}</td>
               <td class="px-5 py-3">{{ po.supplierName }}</td>
               <td class="px-5 py-3">{{ po.orderDate | date }}</td>
@@ -239,6 +263,10 @@ import { FormsModule } from '@angular/forms';
   styles: [],
 })
 export class PurchaseOrderListComponent implements OnInit {
+  // Sorting state
+  sortField: 'poNumber' | 'orderDate' | 'totalAmount' = 'poNumber';
+  sortDirection: 'asc' | 'desc' = 'asc';
+
   // Filtering state for UI
   filterSupplier: string = '';
   filterStatus: string = '';
@@ -249,16 +277,14 @@ export class PurchaseOrderListComponent implements OnInit {
   supplierList: string[] = [];
   statusList: string[] = [];
 
-  // Computed filtered list
+
+  // Computed filtered list (for filtering only)
   get filteredPurchaseOrders(): PurchaseOrder[] {
-    // Helper to get YYYY-MM-DD from ISO or date string
     const toDateString = (d: string) => {
       if (!d) return '';
-      // If ISO string, just take the first 10 chars
       if (d.length >= 10 && d[4] === '-' && d[7] === '-') {
         return d.substring(0, 10);
       }
-      // Fallback: try to parse as Date
       const date = new Date(d);
       const mm = String(date.getMonth() + 1).padStart(2, '0');
       const dd = String(date.getDate()).padStart(2, '0');
@@ -272,13 +298,51 @@ export class PurchaseOrderListComponent implements OnInit {
       const endDate = toDateString(this.filterEndDate);
       const startDateMatch = !startDate || poDate >= startDate;
       const endDateMatch = !endDate || poDate <= endDate;
-      // Price range filter
       let priceMatch = true;
       if (this.filterPriceRange === '0-500') priceMatch = po.totalAmount >= 0 && po.totalAmount <= 500;
       else if (this.filterPriceRange === '500-1000') priceMatch = po.totalAmount > 500 && po.totalAmount <= 1000;
       else if (this.filterPriceRange === '1000+') priceMatch = po.totalAmount > 1000;
       return supplierMatch && statusMatch && startDateMatch && endDateMatch && priceMatch;
     });
+  }
+
+  // Sorted and filtered list (for display)
+  get sortedPurchaseOrders(): PurchaseOrder[] {
+    const arr = [...this.filteredPurchaseOrders];
+    arr.sort((a, b) => {
+      let aVal: any, bVal: any;
+      switch (this.sortField) {
+        case 'poNumber':
+          aVal = a.poNumber;
+          bVal = b.poNumber;
+          break;
+        case 'orderDate':
+          aVal = new Date(a.orderDate).getTime();
+          bVal = new Date(b.orderDate).getTime();
+          break;
+        case 'totalAmount':
+          aVal = a.totalAmount;
+          bVal = b.totalAmount;
+          break;
+        default:
+          aVal = a.poNumber;
+          bVal = b.poNumber;
+      }
+      if (aVal < bVal) return this.sortDirection === 'asc' ? -1 : 1;
+      if (aVal > bVal) return this.sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+    // If descending, show ▼ first, else ▲ first (handled by icon color above)
+    return arr;
+  }
+
+  setSort(field: 'poNumber' | 'orderDate' | 'totalAmount') {
+    if (this.sortField === field) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortField = field;
+      this.sortDirection = 'asc';
+    }
   }
 
   clearFilters() {
