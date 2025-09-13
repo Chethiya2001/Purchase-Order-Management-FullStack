@@ -78,12 +78,34 @@ cd Purchase-Order-Management-FullStack
 - Install **XAMPP** (if not already installed).  
 - Start **Apache** and **MySQL** services.  
 - Make sure your MySQL connection string in `appsettings.json` matches your local credentials.
-- 
+  
 Example:
 ```json
 "ConnectionStrings": {
-  "DefaultConnection": "server=localhost;port=3306;database=PurchaseOrderDB;user=root;password=;"
+  "DefaultConnection": "server=localhost;database=PurchaseOrderDB;user=root;password=;"
 }
+```
+### 3. Backend 
+
+### 3. Backend Setup
+
+1. Navigate to the backend folder and build the project:
+
+```bash
+cd backend
+dotnet build
+```
+
+2. Run initial Entity Framework migrations to create the database schema
+
+```bash
+cd PurchaseOrderManagement.WebApi
+dotnet ef migrations add InitialCreate --project ../PurchaseOrderManagement.Infrastructure --startup-project .
+dotnet ef database update --project ../PurchaseOrderManagement.Infrastructure --startup-project .
+
+```
+
+
 
 
 
