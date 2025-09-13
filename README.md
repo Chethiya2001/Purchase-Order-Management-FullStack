@@ -69,14 +69,23 @@ It allows procurement staff to **manage purchase orders (POs)** with features li
 
 ## 🛠️ Setup Instructions
 
-### 1. Clone Repository
+
+### 1. Install .NET 9
+- Download and install .NET 9 SDK from the official site:  
+  [https://dotnet.microsoft.com/en-us/download/dotnet/9.0](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
+- Verify installation:
+
+```bash
+dotnet --version
+```
+
+### 2. Clone Repository
 ```bash
 git clone https://github.com/your-username/purchase-order-management.git
 cd Purchase-Order-Management-FullStack
 ```
-### 2. Start Xampp or install
 
-### 2. Start XAMPP / Install
+### 3. Start XAMPP / Install
 - Install **XAMPP** (if not already installed).  
 - Start **Apache** and **MySQL** services.  
 - Make sure your MySQL connection string in `appsettings.json` matches your local credentials.
@@ -87,9 +96,8 @@ Example:
   "DefaultConnection": "server=localhost;database=PurchaseOrderDB;user=root;password=;"
 }
 ```
-### 3. Backend 
 
-### 3. Backend Setup
+### 4. Backend Setup
 
 1. Navigate to the backend folder and build the project:
 
@@ -104,7 +112,12 @@ dotnet build
 cd PurchaseOrderManagement.WebApi
 dotnet ef migrations add InitialCreate --project ../PurchaseOrderManagement.Infrastructure --startup-project .
 dotnet ef database update --project ../PurchaseOrderManagement.Infrastructure --startup-project .
+```
 
+3. Run Backend Web Api
+
+```bash
+dotnet run --urls "https://localhost:5001;http://localhost:5000"
 ```
 
 
