@@ -62,7 +62,7 @@ import { FormsModule } from '@angular/forms';
         <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"></div>
       </div>
 
-      <div class="overflow-x-auto rounded-2xl shadow-lg border border-blue-100" *ngIf="!loading && sortedPurchaseOrders.length">
+  <div class="overflow-x-auto rounded-2xl shadow-lg border border-blue-100" *ngIf="!loading">
         <table class="min-w-full bg-white text-sm">
           <thead class="sticky top-0 z-10">
             <tr class="bg-gradient-to-r from-blue-100 to-blue-50 text-blue-900">
@@ -99,7 +99,7 @@ import { FormsModule } from '@angular/forms';
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let po of sortedPurchaseOrders; let i = index" [ngClass]="i % 2 === 0 ? 'bg-white' : 'bg-blue-50'" class="border-b transition hover:bg-blue-100">
+            <tr *ngFor="let po of pagedPurchaseOrders; let i = index" [ngClass]="i % 2 === 0 ? 'bg-white' : 'bg-blue-50'" class="border-b transition hover:bg-blue-100">
               <td class="px-5 py-3 font-mono text-blue-900">{{ po.poNumber }}</td>
               <td class="px-5 py-3">{{ po.supplierName }}</td>
               <td class="px-5 py-3">{{ po.orderDate | date }}</td>
@@ -139,6 +139,20 @@ import { FormsModule } from '@angular/forms';
             </tr>
           </tbody>
         </table>
+  <!-- Pagination Controls -->
+  <div *ngIf="pagedPurchaseOrders.length" class="flex flex-wrap items-center justify-between gap-4 mt-4">
+          <div class="flex items-center gap-2">
+            <label class="text-sm text-gray-700">Rows per page:</label>
+            <select [(ngModel)]="pageSize" (ngModelChange)="goToPage(1)" class="border border-blue-200 rounded px-2 py-1">
+              <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2">
+            <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1" class="px-2 py-1 rounded bg-blue-100 text-blue-700 disabled:opacity-50">Prev</button>
+            <span class="text-sm">Page {{ currentPage }} of {{ totalPages }}</span>
+            <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-2 py-1 rounded bg-blue-100 text-blue-700 disabled:opacity-50">Next</button>
+          </div>
+        </div>
       </div>
       <div *ngIf="!loading && !filteredPurchaseOrders.length" class="text-center text-gray-400 mt-8 text-lg font-semibold">
         No purchase orders found.
@@ -263,6 +277,26 @@ import { FormsModule } from '@angular/forms';
   styles: [],
 })
 export class PurchaseOrderListComponent implements OnInit {
+  // Pagination state
+  pageSizeOptions: number[] = [5, 10, 20, 50, 100];
+  pageSize: number = 10;
+  currentPage: number = 1;
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.sortedPurchaseOrders.length / this.pageSize));
+  }
+
+  get pagedPurchaseOrders(): PurchaseOrder[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.sortedPurchaseOrders.slice(start, start + this.pageSize);
+  }
+
+  goToPage(page: number) {
+    const total = this.totalPages;
+    if (page < 1) this.currentPage = 1;
+    else if (page > total) this.currentPage = total;
+    else this.currentPage = page;
+  }
   // Sorting state
   sortField: 'poNumber' | 'orderDate' | 'totalAmount' = 'poNumber';
   sortDirection: 'asc' | 'desc' = 'asc';
@@ -332,7 +366,7 @@ export class PurchaseOrderListComponent implements OnInit {
       if (aVal > bVal) return this.sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
-    // If descending, show ▼ first, else ▲ first (handled by icon color above)
+
     return arr;
   }
 
@@ -350,6 +384,7 @@ export class PurchaseOrderListComponent implements OnInit {
     this.filterStatus = '';
     this.filterStartDate = '';
     this.filterEndDate = '';
+  this.currentPage = 1;
   }
   purchaseOrders: PurchaseOrder[] = [];
   displayedColumns: string[] = [
