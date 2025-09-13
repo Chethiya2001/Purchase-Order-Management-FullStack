@@ -32,13 +32,27 @@ import { PurchaseOrderService } from '../../service/purchase-order-service';
           <label class="block text-gray-700 font-medium mb-1">Total Amount</label>
           <input type="number" formControlName="totalAmount" required min="0" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition" />
         </div>
-        <div>
-          <label class="block text-gray-700 font-medium mb-1">Status</label>
-          <select formControlName="status" required class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition">
-            <option value="" disabled selected>Select status</option>
-            <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
-          </select>
-        </div>
+       <div class="relative">
+  <button type="button"
+    class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition flex justify-between items-center"
+    (click)="toggleDropdown()">
+    {{ poForm.get('status')?.value || 'Select status' }}
+    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+
+  <!-- Dropup Menu -->
+  <div *ngIf="dropdownOpen"
+    class="absolute bottom-full mb-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+    <div *ngFor="let status of statusOptions"
+      (click)="selectStatus(status)"
+      class="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+      {{ status }}
+    </div>
+  </div>
+</div>
+
         <div class="flex justify-end gap-4 mt-8">
           <button type="button" class="px-6 py-2 rounded-lg bg-gray-500 text-white hover:bg-gray-700 transition" (click)="onCancel()">Cancel</button>
           <button type="submit" class="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-800 transition disabled:opacity-50" [disabled]="!poForm.valid">
@@ -142,4 +156,15 @@ export class PurchaseOrderFormComponent {
     this.formClose.emit();
     this.poForm.reset();
   }
+  dropdownOpen = false;
+
+toggleDropdown() {
+  this.dropdownOpen = !this.dropdownOpen;
+}
+
+selectStatus(status: string) {
+  this.poForm.get('status')?.setValue(status);
+  this.dropdownOpen = false;
+}
+
 }
