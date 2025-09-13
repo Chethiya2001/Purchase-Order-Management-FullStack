@@ -136,7 +136,7 @@ dotnet run --urls "https://localhost:5001;http://localhost:5000"
 
 ### 5. Frontend Setup 
 
-1. Navigate to the frontend folder and build the project:
+1. Navigate to the frontend folder and build the project (got to the root):
 ```bash
 cd frontend
 cd purchase-order
