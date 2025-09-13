@@ -140,7 +140,7 @@ import { FormsModule } from '@angular/forms';
           </tbody>
         </table>
   <!-- Pagination Controls -->
-  <div *ngIf="pagedPurchaseOrders.length" class="flex flex-wrap items-center justify-between gap-4 mt-4">
+  <div *ngIf="pagedPurchaseOrders.length" class="flex flex-wrap items-center justify-between gap-4 m-5">
           <div class="flex items-center gap-2">
             <label class="text-sm text-gray-700">Rows per page:</label>
             <select [(ngModel)]="pageSize" (ngModelChange)="goToPage(1)" class="border border-blue-200 rounded px-2 py-1">
