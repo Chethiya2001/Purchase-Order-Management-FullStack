@@ -199,8 +199,8 @@ import { PurchaseOrderService } from '../../service/purchase-order-service';
                 </p>
               </div>
 
-              <!-- Order Date -->
-              <div class="group">
+              <!-- Order Date Dropdown -->
+              <div class="relative group">
                 <label
                   class="block text-gray-700 font-semibold mb-2 text-sm uppercase tracking-wide"
                 >
@@ -219,11 +219,101 @@ import { PurchaseOrderService } from '../../service/purchase-order-service';
                   </svg>
                   Order Date
                 </label>
-                <input
-                  type="date"
-                  formControlName="orderDate"
-                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:border-gray-300"
-                />
+                <button
+                  type="button"
+                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-300 flex justify-between items-center bg-gray-50/50 hover:bg-white text-left group-hover:border-gray-300"
+                  (click)="toggleDateDropdown()"
+                >
+                  <span [class]="poForm.get('orderDate')?.value ? 'text-gray-900' : 'text-gray-500'">
+                    {{ getFormattedDate() || 'Select date' }}
+                  </span>
+                  <svg
+                    class="w-5 h-5 text-gray-400 transition-transform duration-200"
+                    [class.rotate-180]="dateDropdownOpen"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                <!-- Date Picker Dropdown -->
+                <div
+                  *ngIf="dateDropdownOpen"
+                  class="absolute bottom-full mb-2 w-full bg-white border border-gray-200 rounded-xl shadow-2xl z-20 overflow-hidden animate-fadeIn"
+                >
+                  <!-- Month/Year Navigation -->
+                  <div class="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-100">
+                    <button
+                      type="button"
+                      (click)="previousMonth()"
+                      class="p-1 rounded-lg hover:bg-white/50 transition-colors"
+                    >
+                      <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                      </svg>
+                    </button>
+                    <span class="font-semibold text-gray-700">{{ getMonthYearDisplay() }}</span>
+                    <button
+                      type="button"
+                      (click)="nextMonth()"
+                      class="p-1 rounded-lg hover:bg-white/50 transition-colors"
+                    >
+                      <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                      </svg>
+                    </button>
+                  </div>
+
+                  <!-- Days of Week -->
+                  <div class="grid grid-cols-7 text-xs text-center text-gray-500 bg-gray-50 py-2">
+                    <div *ngFor="let day of dayLabels" class="py-1 font-medium">{{ day }}</div>
+                  </div>
+
+                  <!-- Calendar Grid -->
+                  <div class="grid grid-cols-7 text-sm">
+                    <button
+                      type="button"
+                      *ngFor="let date of calendarDays"
+                      (click)="selectDate(date)"
+                      class="aspect-square flex items-center justify-center hover:bg-indigo-50 transition-colors relative"
+                      [class]="getDateClasses(date)"
+                      [disabled]="!date.isCurrentMonth"
+                    >
+                      <span [class]="date.isSelected ? 'text-white font-semibold' : date.isCurrentMonth ? 'text-gray-700' : 'text-gray-300'">
+                        {{ date.day }}
+                      </span>
+                      <div *ngIf="date.isSelected" class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full m-1"></div>
+                    </button>
+                  </div>
+
+                  <!-- Quick Select Options -->
+                  <div class="border-t border-gray-100 p-2">
+                    <div class="flex gap-2 flex-wrap">
+                      <button
+                        type="button"
+                        (click)="selectToday()"
+                        class="px-3 py-1 text-xs bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
+                      >
+                        Today
+                      </button>
+                      <button
+                        type="button"
+                        (click)="selectTomorrow()"
+                        class="px-3 py-1 text-xs bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors"
+                      >
+                        Tomorrow
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 <p
                   *ngIf="poForm.get('orderDate')?.touched && poForm.get('orderDate')?.invalid"
                   class="text-red-500 text-sm mt-2 flex items-center gap-1 animate-shake"
@@ -337,7 +427,7 @@ import { PurchaseOrderService } from '../../service/purchase-order-service';
                   </svg>
                 </button>
 
-                <!-- Dropup Menu -->
+                <!-- Status Dropdown Menu -->
                 <div
                   *ngIf="dropdownOpen"
                   class="absolute bottom-full mb-2 w-full bg-white border border-gray-200 rounded-xl shadow-2xl z-20 overflow-hidden animate-fadeIn"
@@ -515,6 +605,13 @@ export class PurchaseOrderFormComponent {
   isEditing: boolean = false;
   statusOptions: string[] = [];
   dropdownOpen = false;
+  dateDropdownOpen = false;
+
+  // Calendar properties
+  currentMonth: number = new Date().getMonth();
+  currentYear: number = new Date().getFullYear();
+  dayLabels = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  calendarDays: any[] = [];
 
   constructor(private fb: FormBuilder, private poService: PurchaseOrderService) {
     this.poForm = this.fb.group({
@@ -525,6 +622,7 @@ export class PurchaseOrderFormComponent {
       totalAmount: [0, [Validators.required, Validators.min(0)]],
       status: ['', Validators.required],
     });
+    this.generateCalendarDays();
   }
 
   ngOnInit() {
@@ -595,8 +693,12 @@ export class PurchaseOrderFormComponent {
     this.poForm.reset();
   }
 
+  // Status dropdown methods
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
+    if (this.dropdownOpen) {
+      this.dateDropdownOpen = false;
+    }
   }
 
   selectStatus(status: string) {
@@ -614,4 +716,164 @@ export class PurchaseOrderFormComponent {
     };
     return colorMap[status] || 'bg-gray-400';
   }
-}
+
+  // Date dropdown methods
+  toggleDateDropdown() {
+    this.dateDropdownOpen = !this.dateDropdownOpen;
+    if (this.dateDropdownOpen) {
+      this.dropdownOpen = false;
+      this.generateCalendarDays();
+    }
+  }
+
+  generateCalendarDays() {
+    const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+    const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+
+    this.calendarDays = [];
+
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      const prevMonth = new Date(this.currentYear, this.currentMonth, 0);
+      const day = prevMonth.getDate() - startingDayOfWeek + i + 1;
+      this.calendarDays.push({
+        day: day,
+        isCurrentMonth: false,
+        isSelected: false,
+        date: new Date(this.currentYear, this.currentMonth - 1, day)
+      });
+    }
+
+    // Add days of the current month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(this.currentYear, this.currentMonth, day);
+      const isSelected = this.isDateSelected(date);
+      this.calendarDays.push({
+        day: day,
+        isCurrentMonth: true,
+        isSelected: isSelected,
+        date: date
+      });
+    }
+
+    // Add days from next month to complete the grid
+    const remainingCells = 42 - this.calendarDays.length; // 6 rows * 7 days
+    for (let day = 1; day <= remainingCells; day++) {
+      this.calendarDays.push({
+        day: day,
+        isCurrentMonth: false,
+        isSelected: false,
+        date: new Date(this.currentYear, this.currentMonth + 1, day)
+      });
+    }
+  }
+
+  isDateSelected(date: Date): boolean {
+    const selectedDate = this.poForm.get('orderDate')?.value;
+    if (!selectedDate) return false;
+
+    const selected = new Date(selectedDate);
+    return date.getFullYear() === selected.getFullYear() &&
+           date.getMonth() === selected.getMonth() &&
+           date.getDate() === selected.getDate();
+  }
+
+  selectDate(dateObj: any) {
+    if (!dateObj.isCurrentMonth) return;
+
+    const dateString = this.formatDateForInput(dateObj.date);
+    this.poForm.get('orderDate')?.setValue(dateString);
+    this.dateDropdownOpen = false;
+    this.generateCalendarDays();
+  }
+
+  formatDateForInput(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  getFormattedDate(): string {
+    const dateValue = this.poForm.get('orderDate')?.value;
+    if (!dateValue) return '';
+
+    const date = new Date(dateValue);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
+  getMonthYearDisplay(): string {
+    const date = new Date(this.currentYear, this.currentMonth);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long'
+    });
+  }
+
+  previousMonth() {
+    if (this.currentMonth === 0) {
+      this.currentMonth = 11;
+      this.currentYear--;
+    } else {
+      this.currentMonth--;
+    }
+    this.generateCalendarDays();
+  }
+
+  nextMonth() {
+    if (this.currentMonth === 11) {
+      this.currentMonth = 0;
+      this.currentYear++;
+    } else {
+      this.currentMonth++;
+    }
+    this.generateCalendarDays();
+  }
+
+  selectToday() {
+    const today = new Date();
+    const dateString = this.formatDateForInput(today);
+    this.poForm.get('orderDate')?.setValue(dateString);
+    this.dateDropdownOpen = false;
+
+    // Update calendar to show current month
+    this.currentMonth = today.getMonth();
+    this.currentYear = today.getFullYear();
+    this.generateCalendarDays();
+  }
+
+  selectTomorrow() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dateString = this.formatDateForInput(tomorrow);
+    this.poForm.get('orderDate')?.setValue(dateString);
+    this.dateDropdownOpen = false;
+
+    // Update calendar to show tomorrow's month
+    this.currentMonth = tomorrow.getMonth();
+    this.currentYear = tomorrow.getFullYear();
+    this.generateCalendarDays();
+  }
+
+  getDateClasses(dateObj: any): string {
+    let classes = '';
+
+    if (!dateObj.isCurrentMonth) {
+      classes += ' opacity-30 cursor-not-allowed';
+    } else {
+      classes += ' hover:bg-indigo-50 cursor-pointer';
+    }
+
+    if (dateObj.isSelected) {
+      classes += ' relative z-10';
+    }
+
+    return classes;
+  }
+  }

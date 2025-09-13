@@ -45,7 +45,7 @@ import { FormsModule } from '@angular/forms';
         </div>
 
         <!-- Advanced Filter Bar -->
-        <div class="bg-white/60 backdrop-blur-xl rounded-2xl shadow-xl p-6 mb-8 border border-white/30">
+  <div class="bg-white/60 backdrop-blur-xl rounded-2xl shadow-xl p-6 mb-8 border border-white/30 z-[30] relative">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 items-end">
 
             <!-- Supplier Filter -->
@@ -76,27 +76,114 @@ import { FormsModule } from '@angular/forms';
               </select>
             </div>
 
-            <!-- Start Date Filter -->
-            <div class="group">
-              <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+            <!-- Start Date Filter with Custom Calendar -->
+            <div class="group relative">
+              <label class="block text-sm font-semibold text-gray-700 mb-2  flex items-center gap-2">
                 <svg class="w-4 h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 Start Date
               </label>
-              <input type="date" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100 transition-all duration-300 bg-white/80 hover:bg-white group-hover:border-gray-300" [(ngModel)]="filterStartDate" />
+              <button type="button"
+                class="w-full px-4 py-3 border-2 z-[40] border-gray-200 rounded-xl focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100 transition-all duration-300 flex justify-between items-center bg-white/80 hover:bg-white text-left group-hover:border-gray-300"
+                (click)="toggleStartDateDropdown()">
+                <span [class]="filterStartDate ? 'text-gray-900' : 'text-gray-500'">
+                  {{ getFormattedFilterDate(filterStartDate) || 'Select date' }}
+                </span>
+                <svg class="w-5 h-5 text-gray-400 transition-transform duration-200" [class.rotate-180]="startDateDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div *ngIf="startDateDropdownOpen" class="absolute top-full mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-2xl z-[50] overflow-hidden animate-fadeIn">
+                <div class="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-100">
+                  <button type="button" (click)="previousMonth('start')" class="p-1 rounded-lg hover:bg-white/50 transition-colors">
+                    <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <span class="font-semibold text-gray-700">{{ getMonthYearDisplay('start') }}</span>
+                  <button type="button" (click)="nextMonth('start')" class="p-1 rounded-lg hover:bg-white/50 transition-colors">
+                    <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="grid grid-cols-7 p-2  text-xs text-center text-gray-500 bg-gray-50 py-2">
+                  <div *ngFor="let day of dayLabels" class="py-1 font-medium">{{ day }}</div>
+                </div>
+                <div class="grid grid-cols-7 p-2  text-sm">
+                  <button type="button" *ngFor="let date of startCalendarDays" (click)="selectFilterDate(date, 'start')"
+                    class="aspect-square flex items-center justify-center hover:bg-indigo-50 transition-colors relative"
+                    [class]="getDateClasses(date)" [disabled]="!date.isCurrentMonth">
+                    <span [class]="date.isSelected ? 'text-white font-semibold' : date.isCurrentMonth ? 'text-gray-700' : 'text-gray-300'">
+                      {{ date.day }}
+                    </span>
+                    <div *ngIf="date.isSelected" class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full m-1"></div>
+                  </button>
+                </div>
+                <div class="border-t border-gray-100 p-2">
+                  <div class="flex gap-2 flex-wrap">
+                    <button type="button" (click)="selectToday('start')" class="px-3 py-1 text-xs bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors">Today</button>
+                    <button type="button" (click)="selectTomorrow('start')" class="px-3 py-1 text-xs bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors">Tomorrow</button>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <!-- End Date Filter -->
-            <div class="group">
+            <!-- End Date Filter with Custom Calendar -->
+            <div class="group relative">
               <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                 <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 End Date
               </label>
-              <input type="date" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition-all duration-300 bg-white/80 hover:bg-white group-hover:border-gray-300" [(ngModel)]="filterEndDate" />
+              <button type="button"
+                class="w-full px-4 py-3 border-2 z-[40] border-gray-200 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition-all duration-300 flex justify-between items-center bg-white/80 hover:bg-white text-left group-hover:border-gray-300"
+                (click)="toggleEndDateDropdown()">
+                <span [class]="filterEndDate ? 'text-gray-900' : 'text-gray-500'">
+                  {{ getFormattedFilterDate(filterEndDate) || 'Select date' }}
+                </span>
+                <svg class="w-5 h-5 text-gray-400 transition-transform duration-200" [class.rotate-180]="endDateDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div *ngIf="endDateDropdownOpen" class="absolute top-full mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-2xl z-[50] overflow-hidden animate-fadeIn">
+                <div class="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-100">
+                  <button type="button" (click)="previousMonth('end')" class="p-1 rounded-lg hover:bg-white/50 transition-colors">
+                    <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <span class="font-semibold text-gray-700">{{ getMonthYearDisplay('end') }}</span>
+                  <button type="button" (click)="nextMonth('end')" class="p-1 rounded-lg hover:bg-white/50 transition-colors">
+                    <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="grid grid-cols-7 p-2  text-xs text-center text-gray-500 bg-gray-50 py-2">
+                  <div *ngFor="let day of dayLabels" class="py-1 font-medium">{{ day }}</div>
+                </div>
+                <div class="grid grid-cols-7 p-2  text-sm">
+                  <button type="button" *ngFor="let date of endCalendarDays" (click)="selectFilterDate(date, 'end')"
+                    class="aspect-square flex items-center justify-center hover:bg-indigo-50 transition-colors relative"
+                    [class]="getDateClasses(date)" [disabled]="!date.isCurrentMonth">
+                    <span [class]="date.isSelected ? 'text-white font-semibold' : date.isCurrentMonth ? 'text-gray-700' : 'text-gray-300'">
+                      {{ date.day }}
+                    </span>
+                    <div *ngIf="date.isSelected" class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full m-1"></div>
+                  </button>
+                </div>
+                <div class="border-t border-gray-100 p-2">
+                  <div class="flex gap-2 flex-wrap">
+                    <button type="button" (click)="selectToday('end')" class="px-3 py-1 text-xs bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors">Today</button>
+                    <button type="button" (click)="selectTomorrow('end')" class="px-3 py-1 text-xs bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors">Tomorrow</button>
+                  </div>
+                </div>
+              </div>
             </div>
+
 
             <!-- Price Range Filter -->
             <div class="group">
@@ -532,6 +619,206 @@ import { FormsModule } from '@angular/forms';
 })
 export class PurchaseOrderListComponent implements OnInit {
   // Pagination state
+  // --- Calendar dropdown state and logic for filters ---
+  startDateDropdownOpen = false;
+  endDateDropdownOpen = false;
+  startCurrentMonth: number = new Date().getMonth();
+  startCurrentYear: number = new Date().getFullYear();
+  endCurrentMonth: number = new Date().getMonth();
+  endCurrentYear: number = new Date().getFullYear();
+  dayLabels = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  startCalendarDays: any[] = [];
+  endCalendarDays: any[] = [];
+
+  toggleStartDateDropdown() {
+    this.startDateDropdownOpen = !this.startDateDropdownOpen;
+    if (this.startDateDropdownOpen) {
+      this.endDateDropdownOpen = false;
+      this.generateCalendarDays('start');
+    }
+  }
+  toggleEndDateDropdown() {
+    this.endDateDropdownOpen = !this.endDateDropdownOpen;
+    if (this.endDateDropdownOpen) {
+      this.startDateDropdownOpen = false;
+      this.generateCalendarDays('end');
+    }
+  }
+  generateCalendarDays(type: 'start' | 'end') {
+    const year = type === 'start' ? this.startCurrentYear : this.endCurrentYear;
+    const month = type === 'start' ? this.startCurrentMonth : this.endCurrentMonth;
+    const selectedDate = type === 'start' ? this.filterStartDate : this.filterEndDate;
+    const calendarDays = [];
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      const prevMonth = new Date(year, month, 0);
+      const day = prevMonth.getDate() - startingDayOfWeek + i + 1;
+      calendarDays.push({
+        day: day,
+        isCurrentMonth: false,
+        isSelected: false,
+        date: new Date(year, month - 1, day)
+      });
+    }
+    // Add days of the current month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const isSelected = this.isDateSelectedForFilter(date, selectedDate);
+      calendarDays.push({
+        day: day,
+        isCurrentMonth: true,
+        isSelected: isSelected,
+        date: date
+      });
+    }
+    // Add days from next month to complete the grid
+    const remainingCells = 42 - calendarDays.length;
+    for (let day = 1; day <= remainingCells; day++) {
+      calendarDays.push({
+        day: day,
+        isCurrentMonth: false,
+        isSelected: false,
+        date: new Date(year, month + 1, day)
+      });
+    }
+    if (type === 'start') this.startCalendarDays = calendarDays;
+    else this.endCalendarDays = calendarDays;
+  }
+  isDateSelectedForFilter(date: Date, selectedDate: string): boolean {
+    if (!selectedDate) return false;
+    const selected = new Date(selectedDate);
+    return date.getFullYear() === selected.getFullYear() &&
+           date.getMonth() === selected.getMonth() &&
+           date.getDate() === selected.getDate();
+  }
+  selectFilterDate(dateObj: any, type: 'start' | 'end') {
+    if (!dateObj.isCurrentMonth) return;
+    const dateString = this.formatDateForInput(dateObj.date);
+    if (type === 'start') {
+      this.filterStartDate = dateString;
+      this.startDateDropdownOpen = false;
+      this.startCurrentMonth = dateObj.date.getMonth();
+      this.startCurrentYear = dateObj.date.getFullYear();
+      this.generateCalendarDays('start');
+    } else {
+      this.filterEndDate = dateString;
+      this.endDateDropdownOpen = false;
+      this.endCurrentMonth = dateObj.date.getMonth();
+      this.endCurrentYear = dateObj.date.getFullYear();
+      this.generateCalendarDays('end');
+    }
+  }
+  formatDateForInput(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  getFormattedFilterDate(dateValue: string): string {
+    if (!dateValue) return '';
+    const date = new Date(dateValue);
+    // Format as MM/DD/YYYY
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${mm}/${dd}/${yyyy}`;
+  }
+  getMonthYearDisplay(type: 'start' | 'end'): string {
+    const date = new Date(type === 'start' ? this.startCurrentYear : this.endCurrentYear, type === 'start' ? this.startCurrentMonth : this.endCurrentMonth);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long'
+    });
+  }
+  previousMonth(type: 'start' | 'end') {
+    if (type === 'start') {
+      if (this.startCurrentMonth === 0) {
+        this.startCurrentMonth = 11;
+        this.startCurrentYear--;
+      } else {
+        this.startCurrentMonth--;
+      }
+      this.generateCalendarDays('start');
+    } else {
+      if (this.endCurrentMonth === 0) {
+        this.endCurrentMonth = 11;
+        this.endCurrentYear--;
+      } else {
+        this.endCurrentMonth--;
+      }
+      this.generateCalendarDays('end');
+    }
+  }
+  nextMonth(type: 'start' | 'end') {
+    if (type === 'start') {
+      if (this.startCurrentMonth === 11) {
+        this.startCurrentMonth = 0;
+        this.startCurrentYear++;
+      } else {
+        this.startCurrentMonth++;
+      }
+      this.generateCalendarDays('start');
+    } else {
+      if (this.endCurrentMonth === 11) {
+        this.endCurrentMonth = 0;
+        this.endCurrentYear++;
+      } else {
+        this.endCurrentMonth++;
+      }
+      this.generateCalendarDays('end');
+    }
+  }
+  selectToday(type: 'start' | 'end') {
+    const today = new Date();
+    const dateString = this.formatDateForInput(today);
+    if (type === 'start') {
+      this.filterStartDate = dateString;
+      this.startDateDropdownOpen = false;
+      this.startCurrentMonth = today.getMonth();
+      this.startCurrentYear = today.getFullYear();
+      this.generateCalendarDays('start');
+    } else {
+      this.filterEndDate = dateString;
+      this.endDateDropdownOpen = false;
+      this.endCurrentMonth = today.getMonth();
+      this.endCurrentYear = today.getFullYear();
+      this.generateCalendarDays('end');
+    }
+  }
+  selectTomorrow(type: 'start' | 'end') {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dateString = this.formatDateForInput(tomorrow);
+    if (type === 'start') {
+      this.filterStartDate = dateString;
+      this.startDateDropdownOpen = false;
+      this.startCurrentMonth = tomorrow.getMonth();
+      this.startCurrentYear = tomorrow.getFullYear();
+      this.generateCalendarDays('start');
+    } else {
+      this.filterEndDate = dateString;
+      this.endDateDropdownOpen = false;
+      this.endCurrentMonth = tomorrow.getMonth();
+      this.endCurrentYear = tomorrow.getFullYear();
+      this.generateCalendarDays('end');
+    }
+  }
+  getDateClasses(dateObj: any): string {
+    let classes = '';
+    if (!dateObj.isCurrentMonth) {
+      classes += ' opacity-30 cursor-not-allowed';
+    } else {
+      classes += ' hover:bg-indigo-50 cursor-pointer';
+    }
+    if (dateObj.isSelected) {
+      classes += ' relative z-10';
+    }
+    return classes;
+  }
   pageSizeOptions: number[] = [5, 10, 20, 50, 100];
   pageSize: number = 10;
   currentPage: number = 1;
