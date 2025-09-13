@@ -24,7 +24,7 @@ import { FormsModule } from '@angular/forms';
         <div class="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 mb-8 border border-white/20">
           <div class="flex flex-col lg:flex-row justify-between items-center gap-6">
             <div class="text-center lg:text-left">
-              <h1 class="text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-600 bg-clip-text text-transparent mb-2">
+              <h1 class="text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-600 bg-clip-text text-transparent p-2">
                 Purchase Order Management
               </h1>
               <p class="text-gray-600 text-lg">Manage and track all your purchase orders efficiently</p>
