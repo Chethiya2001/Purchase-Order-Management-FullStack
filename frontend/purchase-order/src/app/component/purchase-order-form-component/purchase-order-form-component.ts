@@ -219,16 +219,11 @@ import { PurchaseOrderService } from '../../service/purchase-order-service';
                   </svg>
                   Order Date
                 </label>
-              <input
-  type="date"
-  formControlName="orderDate"
-  placeholder="e.g. 2025-09-13"
-  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl
-         focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100
-         transition-all duration-300 bg-gray-50/50 hover:bg-white
-         group-hover:border-gray-300 placeholder-gray-400"
-/>
-
+                <input
+                  type="date"
+                  formControlName="orderDate"
+                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-300 bg-gray-50/50 hover:bg-white group-hover:border-gray-300"
+                />
                 <p
                   *ngIf="poForm.get('orderDate')?.touched && poForm.get('orderDate')?.invalid"
                   class="text-red-500 text-sm mt-2 flex items-center gap-1 animate-shake"
