@@ -78,6 +78,20 @@ It allows procurement staff to **manage purchase orders (POs)** with features li
 ```bash
 dotnet --version
 ```
+### 2. Install Node.js and Angular (20)
+
+- **Install Node.js** (which includes npm)  
+  1. Go to [https://nodejs.org](https://nodejs.org)  
+  2. Download the **LTS** version (recommended) or Node 20+ for Angular 20  
+  3. Run the installer and follow the prompts  
+
+- **Verify Node.js installation**:
+
+```bash
+node -v
+npm -v
+npm install -g @angular/cli
+```
 
 ### 2. Clone Repository
 ```bash
@@ -120,7 +134,16 @@ dotnet ef database update --project ../PurchaseOrderManagement.Infrastructure --
 dotnet run --urls "https://localhost:5001;http://localhost:5000"
 ```
 
+### 5. Frontend Setup 
 
+1. Navigate to the frontend folder and build the project (got to the root):
+```bash
+cd frontend
+cd purchase-order
+````
 
-
-
+2. Install dependencies and start the application:
+```bash
+npm i
+npm start
+````
