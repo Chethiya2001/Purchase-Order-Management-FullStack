@@ -553,7 +553,7 @@ import { FormsModule } from '@angular/forms';
 
         <!-- Add/Edit Modal -->
         <div *ngIf="showModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" (click)="closeModal()">
-          <div class="w-full max-w-4xl relative animate-fade-in-up" (click)="$event.stopPropagation()">
+          <div class="relative" (click)="$event.stopPropagation()">
             <app-purchase-order-form-component
               [purchaseOrderToEdit]="editingPO"
               (formSubmit)="onFormSubmit($event)"

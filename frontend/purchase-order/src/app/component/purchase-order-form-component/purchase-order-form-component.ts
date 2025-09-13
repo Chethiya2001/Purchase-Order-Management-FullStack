@@ -9,9 +9,7 @@ import { PurchaseOrderService } from '../../service/purchase-order-service';
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule],
   template: `
-    <div
-      class="bg-gradient-to-br from-indigo-100 via-purple-50 to-teal-100 flex items-center justify-center "
-    >
+
       <div class="w-full max-w-2xl">
         <!-- Main Card -->
         <div
@@ -533,7 +531,7 @@ import { PurchaseOrderService } from '../../service/purchase-order-service';
           ></div>
         </div>
       </div>
-    </div>
+ 
 
     <style>
       @keyframes fadeIn {
