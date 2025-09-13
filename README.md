@@ -5,6 +5,8 @@ This application is a **Purchase Order Management System** built with **.NET 9 (
 
 It allows procurement staff to **manage purchase orders (POs)** with features like **listing, filtering, sorting, pagination, add/edit/delete**.  
 
+![Purchase Order Screenshot](images/screenshot-01.png)
+
 ---
 
 ## 🚀 Features
@@ -71,4 +73,41 @@ It allows procurement staff to **manage purchase orders (POs)** with features li
 ```bash
 git clone https://github.com/your-username/purchase-order-management.git
 cd Purchase-Order-Management-FullStack
+```
+### 2. Start Xampp or install
+
+### 2. Start XAMPP / Install
+- Install **XAMPP** (if not already installed).  
+- Start **Apache** and **MySQL** services.  
+- Make sure your MySQL connection string in `appsettings.json` matches your local credentials.
+  
+Example:
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "server=localhost;database=PurchaseOrderDB;user=root;password=;"
+}
+```
+### 3. Backend 
+
+### 3. Backend Setup
+
+1. Navigate to the backend folder and build the project:
+
+```bash
+cd backend
+dotnet build
+```
+
+2. Run initial Entity Framework migrations to create the database schema
+
+```bash
+cd PurchaseOrderManagement.WebApi
+dotnet ef migrations add InitialCreate --project ../PurchaseOrderManagement.Infrastructure --startup-project .
+dotnet ef database update --project ../PurchaseOrderManagement.Infrastructure --startup-project .
+
+```
+
+
+
+
 
