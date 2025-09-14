@@ -54,6 +54,7 @@ Request/response shapes are described in the `Application/DTOs` folder.
 - Support **filtering** (by supplier, status, or date range).
 - Support **sorting** (by PO number, order date, total amount).
 - Support **pagination** for large datasets.
+- Display reports with lazy loading
 
 ### 2. Manage Purchase Orders
 - Create new purchase orders.
