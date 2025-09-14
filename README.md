@@ -45,7 +45,7 @@ It allows procurement staff to **manage purchase orders (POs)** with features li
 - `PUT /api/purchase-orders/{id}` — update order
 - `DELETE /api/purchase-orders/{id}` — delete order
 
-Request/response shapes are described in the `Application/DTOs` folder.
+Request/response shapes are described in the `DTOs` file.
 
 ---
 
