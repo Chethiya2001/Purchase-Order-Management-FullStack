@@ -85,7 +85,7 @@ Request/response shapes are described in the `Application/DTOs` folder.
 ### Sorting Assumptions
 - PO Number, Order Date, or Total Amount can apply sorting.  
 - Sorting defaults to **ascending order** unless explicitly requested as descending.  
-- Only one column can be sorted at a time (for simplicity).  
+- Columns can be sorted at a time.  
 
 ### Pagination Assumptions
 - Default page size is 10.  
