@@ -12,7 +12,7 @@ using PurchaseOrderManagement.Infrastructure.Persistence;
 namespace PurchaseOrderManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250911071351_InitialCreate")]
+    [Migration("20250914090704_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
