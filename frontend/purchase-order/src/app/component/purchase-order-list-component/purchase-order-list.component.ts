@@ -32,7 +32,7 @@ import { Router } from '@angular/router';
             </div>
           <button
            (click)="goToReports()"
-            class="group relative px-6 py-4 bg-gradient-to-r from-indigo-400 via-purple-400 to-teal-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden"
+            class="group relative px-8 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden"
           >
             <!-- Animated shine effect -->
             <div class="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 skew-x-12"></div>
