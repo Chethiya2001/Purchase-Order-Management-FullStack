@@ -6,6 +6,8 @@ This application is a **Purchase Order Management System** built with **.NET 9 (
 It allows procurement staff to **manage purchase orders (POs)** with features like **listing, filtering, sorting, pagination, add/edit/delete**.  
 
 ![Purchase Order Screenshot](images/screenshot-01.png)
+![Purchase Order Screenshot](images/screenshot-02.png)
+![Purchase Order Screenshot](images/screenshot-03.png)
 
 ---
 
