@@ -675,7 +675,7 @@ export class PurchaseOrderListComponent implements OnInit {
         date: date
       });
     }
-    // Add days from next month to complete the grid
+
     const remainingCells = 42 - calendarDays.length;
     for (let day = 1; day <= remainingCells; day++) {
       calendarDays.push({
@@ -838,11 +838,11 @@ export class PurchaseOrderListComponent implements OnInit {
     else if (page > total) this.currentPage = total;
     else this.currentPage = page;
   }
-  // Sorting state
+
   sortField: 'poNumber' | 'orderDate' | 'totalAmount' = 'poNumber';
   sortDirection: 'asc' | 'desc' = 'asc';
 
-  // Filtering state for UI
+
   filterSupplier: string = '';
   filterStatus: string = '';
   filterStartDate: string = '';
@@ -853,7 +853,6 @@ export class PurchaseOrderListComponent implements OnInit {
   statusList: string[] = [];
 
 
-  // Computed filtered list (for filtering only)
   get filteredPurchaseOrders(): PurchaseOrder[] {
     const toDateString = (d: string) => {
       if (!d) return '';
@@ -881,7 +880,7 @@ export class PurchaseOrderListComponent implements OnInit {
     });
   }
 
-  // Sorted and filtered list (for display)
+  // Sorted and filtered list - for display
   get sortedPurchaseOrders(): PurchaseOrder[] {
     const arr = [...this.filteredPurchaseOrders];
     arr.sort((a, b) => {
@@ -964,9 +963,7 @@ export class PurchaseOrderListComponent implements OnInit {
       next: (res: ApiResponse<PurchaseOrder[]>) => {
         if (res.success) {
           this.purchaseOrders = res.data;
-          // Populate supplier list (unique names)
           this.supplierList = Array.from(new Set(res.data.map(po => po.supplierName))).sort();
-          // Dynamically build priceRanges based on data
           const has0_500 = res.data.some(po => po.totalAmount >= 0 && po.totalAmount <= 500);
           const has500_1000 = res.data.some(po => po.totalAmount > 500 && po.totalAmount <= 1000);
           const has1000plus = res.data.some(po => po.totalAmount > 1000);
@@ -993,7 +990,6 @@ export class PurchaseOrderListComponent implements OnInit {
 
   onFormSubmit(event: any) {
     this.fetchPurchaseOrders();
-    // Modal will close via (formClose)
   }
   viewItem(po: PurchaseOrder) {
     this.showViewModal = true;

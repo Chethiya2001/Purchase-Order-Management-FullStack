@@ -4,11 +4,9 @@ import { PurchaseOrderListComponent } from "./component/purchase-order-list-comp
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, PurchaseOrderListComponent],
+  imports: [RouterOutlet],
   template: `
-
-
-    <app-purchase-order-list/>
+    <router-outlet/>
   `,
   styles: [],
 })

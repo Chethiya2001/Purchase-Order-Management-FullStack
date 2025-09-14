@@ -45,81 +45,8 @@ body {
   font-size: 1.1em;
 }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: normal;
-
-}
-button {
-  font-family: inherit;
-}
 
 
-.btn-primary  {
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 20px;
-}
-.btn-primary:hover {
-  background-color: #2563eb;
-}
-.btn-secondary {
-  padding: 10px 20px;
-  background: #6b7280;
-  color: white;
-  border-radius: 10px;
-}
-
-.btn-secondary:hover {
-  background: #4b5563;
-}
-
-
-.cdk-overlay-container, .cdk-overlay-pane {
-  z-index: 2100 !important;
-}
-
-/* Optional: Prevent overlay from escaping modal (if modal is not fullscreen) */
-.form-modal {
-  position: relative;
-  overflow: visible;
-  z-index: 2000;
-}
-
-/* Modernize button appearance */
-.btn-primary  {
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 12px 28px;
-  font-size: 1rem;
-  font-weight: 500;
-  box-shadow: 0 2px 8px rgba(59,130,246,0.08);
-  transition: background 0.2s, box-shadow 0.2s;
-}
-.btn-primary:hover {
-  background-color: #2563eb;
-  box-shadow: 0 4px 16px rgba(59,130,246,0.12);
-}
-.btn-secondary {
-  padding: 12px 28px;
-  background: #6b7280;
-  color: white;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: background 0.2s;
-}
-.btn-secondary:hover {
-  background: #4b5563;
-}
 
 .modal-overlay {
   position: fixed;

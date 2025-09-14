@@ -531,7 +531,7 @@ import { PurchaseOrderService } from '../../service/purchase-order-service';
           ></div>
         </div>
       </div>
- 
+
 
     <style>
       @keyframes fadeIn {
@@ -839,8 +839,6 @@ export class PurchaseOrderFormComponent {
     const dateString = this.formatDateForInput(today);
     this.poForm.get('orderDate')?.setValue(dateString);
     this.dateDropdownOpen = false;
-
-    // Update calendar to show current month
     this.currentMonth = today.getMonth();
     this.currentYear = today.getFullYear();
     this.generateCalendarDays();
