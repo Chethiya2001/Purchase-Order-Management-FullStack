@@ -17,6 +17,7 @@ It allows procurement staff to **manage purchase orders (POs)** with features li
  
  This README explains the project purpose, how to run it locally, the architecture and design decisions, and
  How to evaluate the work.
+ 
 ---
 
 ## Architecture & Design Decisions
@@ -31,6 +32,7 @@ It allows procurement staff to **manage purchase orders (POs)** with features li
 - **DTOs:** Used for API surface and mapping to domain entities to decouple internal models
 - **Validation:** Centralized request validation using Data Annotations
 - **Error Handling:** Global exception middleware to return consistent error responses
+  
 ---
 
 ## Example API Endpoints
