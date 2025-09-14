@@ -4,6 +4,7 @@ import { PurchaseOrder, ApiResponse } from '../../model/purchase-order.model';
 import { PurchaseOrderFormComponent } from '../purchase-order-form-component/purchase-order-form-component';
 import { CommonModule, DatePipe, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-purchase-order-list',
@@ -29,6 +30,24 @@ import { FormsModule } from '@angular/forms';
               </h1>
               <p class="text-gray-600 text-lg">Manage and track all your purchase orders efficiently</p>
             </div>
+          <button
+           (click)="goToReports()"
+            class="group relative px-6 py-4 bg-gradient-to-r from-indigo-400 via-purple-400 to-teal-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden"
+          >
+            <!-- Animated shine effect -->
+            <div class="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 skew-x-12"></div>
+
+            <!-- Button content -->
+            <div class="relative z-10 flex items-center gap-3">
+              <!-- Icon for reports -->
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 17v-2a4 4 0 014-4h4m0 0l-3-3m3 3l-3 3" />
+              </svg>
+              <span>Related Reports</span>
+            </div>
+          </button>
+
             <button
               class="group relative px-8 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden"
               (click)="openAddModel()"
@@ -40,6 +59,7 @@ import { FormsModule } from '@angular/forms';
                 </svg>
                 <span>Add New PO</span>
               </div>
+
             </button>
           </div>
         </div>
@@ -630,6 +650,8 @@ export class PurchaseOrderListComponent implements OnInit {
   startCalendarDays: any[] = [];
   endCalendarDays: any[] = [];
 
+
+
   toggleStartDateDropdown() {
     this.startDateDropdownOpen = !this.startDateDropdownOpen;
     if (this.startDateDropdownOpen) {
@@ -692,8 +714,8 @@ export class PurchaseOrderListComponent implements OnInit {
     if (!selectedDate) return false;
     const selected = new Date(selectedDate);
     return date.getFullYear() === selected.getFullYear() &&
-           date.getMonth() === selected.getMonth() &&
-           date.getDate() === selected.getDate();
+      date.getMonth() === selected.getMonth() &&
+      date.getDate() === selected.getDate();
   }
   selectFilterDate(dateObj: any, type: 'start' | 'end') {
     if (!dateObj.isCurrentMonth) return;
@@ -848,7 +870,7 @@ export class PurchaseOrderListComponent implements OnInit {
   filterStartDate: string = '';
   filterEndDate: string = '';
   filterPriceRange: string = '';
-  priceRanges: { label: string; value: string }[] = [ { label: 'All', value: '' } ];
+  priceRanges: { label: string; value: string }[] = [{ label: 'All', value: '' }];
   supplierList: string[] = [];
   statusList: string[] = [];
 
@@ -924,7 +946,7 @@ export class PurchaseOrderListComponent implements OnInit {
     this.filterStatus = '';
     this.filterStartDate = '';
     this.filterEndDate = '';
-  this.currentPage = 1;
+    this.currentPage = 1;
   }
   purchaseOrders: PurchaseOrder[] = [];
   displayedColumns: string[] = [
@@ -945,7 +967,7 @@ export class PurchaseOrderListComponent implements OnInit {
   viewLoading: boolean = false;
   isEditing: boolean = false;
 
-  constructor(private purchaseOrderService: PurchaseOrderService) {}
+  constructor(private purchaseOrderService: PurchaseOrderService, private router: Router) { }
 
   ngOnInit() {
     this.fetchPurchaseOrders();
@@ -967,7 +989,7 @@ export class PurchaseOrderListComponent implements OnInit {
           const has0_500 = res.data.some(po => po.totalAmount >= 0 && po.totalAmount <= 500);
           const has500_1000 = res.data.some(po => po.totalAmount > 500 && po.totalAmount <= 1000);
           const has1000plus = res.data.some(po => po.totalAmount > 1000);
-          this.priceRanges = [ { label: 'All', value: '' } ];
+          this.priceRanges = [{ label: 'All', value: '' }];
           if (has0_500) this.priceRanges.push({ label: '0 - 500', value: '0-500' });
           if (has500_1000) this.priceRanges.push({ label: '500 - 1000', value: '500-1000' });
           if (has1000plus) this.priceRanges.push({ label: '1000+', value: '1000+' });
@@ -995,7 +1017,7 @@ export class PurchaseOrderListComponent implements OnInit {
     this.showViewModal = true;
     this.viewingPO = null;
     this.viewLoading = true;
-  this.purchaseOrderService.getById(po.id!).subscribe({
+    this.purchaseOrderService.getById(po.id!).subscribe({
       next: (res: ApiResponse<PurchaseOrder>) => {
         if (res.success) {
           this.viewingPO = res.data;
@@ -1033,5 +1055,8 @@ export class PurchaseOrderListComponent implements OnInit {
     console.log('setEditMode', po);
     this.isEditing = true;
     this.editingPO = po;
+  }
+  goToReports() {
+    this.router.navigate(['/reports']);
   }
 }

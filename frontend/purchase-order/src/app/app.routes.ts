@@ -6,5 +6,9 @@ export const routes: Routes = [
     path: '',
     pathMatch: 'full',
     component: PurchaseOrderListComponent
+  },
+  {
+    path: 'reports',
+    loadChildren: () => import('./component/reports/reports.module').then(m => m.ReportsModule)
   }
 ];
