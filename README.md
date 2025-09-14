@@ -1,4 +1,4 @@
-# 📦 Purchase Order Management Application
+# Purchase Order Management Application
 
 Welcome to the coding exercise!  
 This application is a **Purchase Order Management System** built with **.NET 9 (Web API)**, **Angular**, and **SQL Database (Code First)**.  
@@ -9,7 +9,7 @@ It allows procurement staff to **manage purchase orders (POs)** with features li
 
 ---
 
-## Overview
+## 📦 Overview
 
  A full‑stack Purchase Order Management application built to demonstrate real‑world engineering practices
  using .NET Core (backend), Angular (frontend), and SQL (relational database). The project emphasizes a
@@ -20,7 +20,7 @@ It allows procurement staff to **manage purchase orders (POs)** with features li
  
 ---
 
-## Architecture & Design Decisions
+## 🏗️ Architecture & Design Decisions
 
 - **Clean Architecture:** Separation of concerns into layers (API, Application / Use Cases, Domain, Infrastructure) to keep core domain independent of frameworks
 - **SOLID Principles:**
@@ -35,7 +35,7 @@ It allows procurement staff to **manage purchase orders (POs)** with features li
   
 ---
 
-## Example API Endpoints
+## 🌐 Example API Endpoints
 
 - `GET /api/purchase-orders` — list purchase orders
 - `GET /api/purchase-orders/{id}` — get single order
