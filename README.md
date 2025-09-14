@@ -1,4 +1,4 @@
-# 📦 Purchase Order Management Application
+# Purchase Order Management Application
 
 Welcome to the coding exercise!  
 This application is a **Purchase Order Management System** built with **.NET 9 (Web API)**, **Angular**, and **SQL Database (Code First)**.  
@@ -6,6 +6,44 @@ This application is a **Purchase Order Management System** built with **.NET 9 (
 It allows procurement staff to **manage purchase orders (POs)** with features like **listing, filtering, sorting, pagination, add/edit/delete**.  
 
 ![Purchase Order Screenshot](images/screenshot-01.png)
+
+---
+
+## 📦 Overview
+
+ A full‑stack Purchase Order Management application built to demonstrate real‑world engineering practices
+ using .NET Core (backend), Angular (frontend), and SQL (relational database). The project emphasizes a
+ clean, modular architecture, SOLID principles, testability, and maintainability.
+ 
+ This README explains the project purpose, how to run it locally, the architecture and design decisions, and
+ How to evaluate the work.
+ 
+---
+
+## 🏗️ Architecture & Design Decisions
+
+- **Clean Architecture:** Separation of concerns into layers (API, Application / Use Cases, Domain, Infrastructure) to keep core domain independent of frameworks
+- **SOLID Principles:**
+  - Single Responsibility: Controllers are small, services-focused
+  - Dependency Inversion: Use interfaces and DI
+  - Open/Closed: Services are extendable without modifying existing code
+  - Liskov Substitution & Interface Segregation applied where relevant
+- **Repository & Unit of Work:** Abstractions for data access for easier testing and flexibility
+- **DTOs:** Used for API surface and mapping to domain entities to decouple internal models
+- **Validation:** Centralized request validation using Data Annotations
+- **Error Handling:** Global exception middleware to return consistent error responses
+  
+---
+
+## 🌐 Example API Endpoints
+
+- `GET /api/purchase-orders` — list purchase orders
+- `GET /api/purchase-orders/{id}` — get single order
+- `POST /api/purchase-orders` — create order (payload: supplier, date, lines)
+- `PUT /api/purchase-orders/{id}` — update order
+- `DELETE /api/purchase-orders/{id}` — delete order
+
+Request/response shapes are described in the `Application/DTOs` folder.
 
 ---
 
@@ -47,7 +85,7 @@ It allows procurement staff to **manage purchase orders (POs)** with features li
 ### Sorting Assumptions
 - PO Number, Order Date, or Total Amount can apply sorting.  
 - Sorting defaults to **ascending order** unless explicitly requested as descending.  
-- Only one column can be sorted at a time (for simplicity).  
+- Columns can be sorted at a time.  
 
 ### Pagination Assumptions
 - Default page size is 10.  
@@ -147,3 +185,10 @@ cd purchase-order
 npm i
 npm start
 ````
+---
+## Contact
+
+- Author: **Chethiya Bandara Herath**
+- Email: **chethiyabandaraherath@gmail.com**
+- Mobile: **+94757120896**
+
