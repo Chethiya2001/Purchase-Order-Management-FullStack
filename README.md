@@ -54,7 +54,7 @@ It allows procurement staff to **manage purchase orders (POs)** with features li
 - The client can change the page size.  
 
 ### Performance Assumption
-- Filtering, sorting, and pagination are implemented **server-side** to handle large datasets.  
+- Filtering, sorting, and pagination are implemented to handle large datasets.  
 
 ---
 
@@ -131,7 +131,7 @@ dotnet ef database update --project ../PurchaseOrderManagement.Infrastructure --
 3. Run Backend Web Api
 
 ```bash
-dotnet run --urls "https://localhost:5001;http://localhost:5000"
+dotnet run
 ```
 
 ### 5. Frontend Setup 
